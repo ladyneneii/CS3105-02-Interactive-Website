@@ -6,11 +6,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./styles/index.css";
-import Button from "./components/Button";
+import "../styles/index.css";
+import Button from "../components/Button";
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
-const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
+const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%_=+]).{8,24}$/;
 
 const Register = () => {
   const userRef = useRef<HTMLInputElement | null>(null);
@@ -95,12 +95,18 @@ const Register = () => {
               <div className="mb-3">
                 <label htmlFor="username" className="form-label">
                   Username:
-                  <span className={validName ? "valid" : "hide"}>
-                    <FontAwesomeIcon icon={faCheck} />
-                  </span>
-                  <span className={validName || !user ? "hide" : "invalid"}>
-                    <FontAwesomeIcon icon={faTimes} />
-                  </span>
+                  <FontAwesomeIcon
+                    icon={faCheck}
+                    className={`custom-check-icon ${
+                      validName ? "valid" : "hide"
+                    }`}
+                  />
+                  <FontAwesomeIcon
+                    icon={faTimes}
+                    className={`custom-times-icon ${
+                      validName || !user ? "hide" : "invalid"
+                    }`}
+                  />
                 </label>
                 <input
                   type="text"
@@ -137,12 +143,18 @@ const Register = () => {
               <div className="mb-3">
                 <label htmlFor="password" className="form-label">
                   Password:
-                  <span className={validName ? "valid" : "hide"}>
-                    <FontAwesomeIcon icon={faCheck} />
-                  </span>
-                  <span className={validName || !pwd ? "hide" : "invalid"}>
-                    <FontAwesomeIcon icon={faTimes} />
-                  </span>
+                  <FontAwesomeIcon
+                    icon={faCheck}
+                    className={`custom-check-icon ${
+                      validPwd ? "valid" : "hide"
+                    }`}
+                  />
+                  <FontAwesomeIcon
+                    icon={faTimes}
+                    className={`custom-times-icon ${
+                      validPwd || !pwd ? "hide" : "invalid"
+                    }`}
+                  />
                 </label>
                 <input
                   type="password"
@@ -182,11 +194,15 @@ const Register = () => {
                   Confirm Password:
                   <FontAwesomeIcon
                     icon={faCheck}
-                    className={validMatch && matchPwd ? "valid" : "hide"}
+                    className={`custom-check-icon ${
+                      validMatch && matchPwd ? "valid" : "hide"
+                    }`}
                   />
                   <FontAwesomeIcon
                     icon={faTimes}
-                    className={validMatch || !matchPwd ? "hide" : "invalid"}
+                    className={`custom-times-icon ${
+                      validMatch || !matchPwd ? "hide" : "invalid"
+                    }`}
                   />
                 </label>
                 <input

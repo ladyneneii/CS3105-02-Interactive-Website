@@ -29,6 +29,10 @@ textarea {
     left: -1000px;
 }
 
+.valid, .invalid {
+  display: inline;
+}
+
 .hide {
   display: none;
 }
@@ -50,4 +54,13 @@ h1 {
 .container-sm {
   width: 500px;
 }
+
+.custom-check-icon {
+  color: green; 
+}
+
+.custom-times-icon {
+  color: red; 
+}
+
 
