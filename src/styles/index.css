@@ -1,0 +1,53 @@
+/* IMPORTS */
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;800&display=swap');
+
+/* RESET */
+*,
+*::after,
+*::before {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+input,
+button,
+textarea {
+    font: inherit;
+}
+
+/* VARIABLES */
+:root {
+  /* FONTS */
+  --FF: 'Poppins', sans-serif;
+  --FW: 600;
+}
+
+/* UTILITY CLASSES */
+.offscreen {
+    position: absolute;
+    left: -1000px;
+}
+
+.hide {
+  display: none;
+}
+
+/* GENERAL STYLES */
+html {
+    scroll-behavior: smooth;
+    font-size: var(--FS);
+    font-family: var(--FF);
+    background-color: var(--BGCOLOR);
+    background-image: var(--BGIMAGE);
+}
+
+h1 {
+  font-weight: var(--FW);
+}
+
+/* CUSTOM BOOTSTRAP STYLES */
+.container-sm {
+  width: 500px;
+}
+
