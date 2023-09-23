@@ -1,17 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import Card from "../components/Card";
+import Navbar from "../components/Navbar";
 
 const MainPage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     setIsLoading(true);
-  //   }, 2000);
-  // }, []);
-
   return (
     <>
+      <Navbar></Navbar>
+
       <div className="container text-center">
         <div className="row">
           {[...Array(12)].map((_, index) => (
