@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/index.css";
 import Button from "../components/Button";
+import { Link } from "react-router-dom";
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%_=+]).{8,24}$/;
@@ -76,7 +77,7 @@ const Register = () => {
           <section>
             <h1>Success!</h1>
             <p>
-              <a href="#">Sign In</a>
+              <Link to="/SignIn">Sign In</Link>
             </p>
           </section>
         ) : (
@@ -243,7 +244,7 @@ const Register = () => {
               <br />
               <span className="line">
                 {/*put router link here*/}
-                <a href="#">Sign In</a>
+                <Link to="/SignIn">Sign In</Link>
               </span>
             </p>
           </section>

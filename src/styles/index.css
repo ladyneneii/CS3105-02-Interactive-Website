@@ -29,7 +29,7 @@ textarea {
     left: -1000px;
 }
 
-.valid, .invalid {
+.valid, .invalid, .instructions, .errmsg {
   display: inline;
 }
 
