@@ -55,7 +55,6 @@ const Card = ({ load }: Props) => {
           <Skeleton
             variant="rounded"
             animation="wave"
-            className="skeleton card__width"
             width={imgWidth}
             height={imgHeight}
           />
@@ -69,7 +68,9 @@ const Card = ({ load }: Props) => {
               animation="wave"
               width={titleWidth}
               height={titleHeight}
-              className="card-title skeleton"
+              style={{
+                marginBottom: 8,
+              }}
             />
           )}
           {isLoading ? (
@@ -83,7 +84,9 @@ const Card = ({ load }: Props) => {
               animation="wave"
               width={textWidth}
               height={textHeight}
-              className="skeleton"
+              style={{
+                marginBottom: 16,
+              }}
             />
           )}
           <a href="#" className="btn btn-primary">
