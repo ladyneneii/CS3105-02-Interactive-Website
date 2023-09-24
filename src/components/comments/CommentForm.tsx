@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-interface CommentFormProps {
+interface Props {
   handleSubmit: (text: string, parentId: string | null) => void;
   submitLabel: string;
   hasCancelButton?: boolean;
@@ -8,18 +8,18 @@ interface CommentFormProps {
   initialText?: string;
 }
 
-const CommentForm: React.FC<CommentFormProps> = ({
+const CommentForm = ({
   handleSubmit,
   submitLabel,
   hasCancelButton = false,
   handleCancel,
   initialText = "",
-}) => {
+}: Props) => {
   const [text, setText] = useState(initialText);
   const isTextareaDisabled = text.length === 0;
 
-  const onSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     handleSubmit(text, null); // Pass null as parentId when no parentId is provided
     setText("");
   };

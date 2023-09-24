@@ -1,7 +1,8 @@
-import React, { useState } from "react";
 import CommentForm from "./CommentForm";
+import jiafei from "../../assets/img/jiafei-498x486.webp";
+import "../../styles/components/comment.css";
 
-interface CommentProps {
+interface Props {
   comment: {
     id: string;
     body: string;
@@ -19,7 +20,7 @@ interface CommentProps {
   currentUserId: string;
 }
 
-const Comment: React.FC<CommentProps> = ({
+const Comment = ({
   comment,
   replies,
   setActiveComment,
@@ -29,9 +30,7 @@ const Comment: React.FC<CommentProps> = ({
   addComment,
   parentId = null,
   currentUserId,
-}) => {
-
-  
+}: Props) => {
   const isEditing =
     activeComment &&
     activeComment.id === comment.id &&
@@ -51,11 +50,9 @@ const Comment: React.FC<CommentProps> = ({
   const createdAt = new Date(comment.createdAt).toLocaleDateString();
 
   return (
-   
     <div key={comment.id} className="comment">
-      
       <div className="comment-image-container">
-        <img src="/user-icon.png" alt="" />
+        <img src={jiafei} alt="purr" className="comment-img" width={50} height={50} />
       </div>
 
       <div className="comment-right-part">
@@ -66,14 +63,14 @@ const Comment: React.FC<CommentProps> = ({
         {!isEditing && <div className="comment-text">{comment.body}</div>}
         {isEditing && (
           <CommentForm
-          submitLabel="Update"
-          hasCancelButton
-          initialText={comment.body}
-          handleSubmit={(text: string) => updateComment(text, comment.id)}
-          handleCancel={() => {
-            setActiveComment(null);
-          }}
-        />
+            submitLabel="Update"
+            hasCancelButton
+            initialText={comment.body}
+            handleSubmit={(text: string) => updateComment(text, comment.id)}
+            handleCancel={() => {
+              setActiveComment(null);
+            }}
+          />
         )}
         <div className="comment-actions">
           {canReply && (
