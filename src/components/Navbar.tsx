@@ -63,9 +63,9 @@ const Navbar = () => {
               </ul>
             </li>
             <li className="nav-item">
-              <a className="nav-link disabled" aria-disabled="true">
-                Disabled
-              </a>
+              <Link to="/Comment" className="nav-link">
+                Comments
+              </Link>
             </li>
           </ul>
           <form className="d-flex" role="search">
