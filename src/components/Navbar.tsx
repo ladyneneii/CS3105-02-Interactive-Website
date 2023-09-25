@@ -63,7 +63,7 @@ const Navbar = () => {
               </ul>
             </li>
             <li className="nav-item">
-              <Link to="/Comment" className="nav-link">
+              <Link to="/CommentsPage" className="nav-link">
                 Comments
               </Link>
             </li>

@@ -13,7 +13,7 @@ const App = () => {
           <Route path="/SignIn" element={<SignIn />} />
           <Route path="/MainPage" element={<MainPage />} />
           <Route
-            path="/Comment"
+            path="/CommentsPage"
             element={<CommentsPage commentsUrl="placeholder" currentUserId="1" />}
           />
         </Routes>
