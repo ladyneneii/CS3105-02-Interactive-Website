@@ -1,4 +1,5 @@
 import CommentForm from "./CommentForm";
+import CommentData from "../../api/comments_api"
 import jiafei from "../../assets/img/jiafei-498x486.webp";
 import "../../styles/components/comment.css";
 
@@ -10,7 +11,7 @@ interface Props {
     userId: string;
     createdAt: string;
   };
-  replies: any[];
+  replies: CommentData[];
   setActiveComment: (comment: { id: string; type: string } | null) => void;
   activeComment: { id: string; type: string } | null;
   updateComment: (text: string, id: string) => void;

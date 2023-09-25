@@ -2,28 +2,29 @@ import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import CommentForm from "../components/comments/CommentForm";
 import Comment from "../components/comments/Comment";
-import {
+import CommentData, {
   getComments as getCommentsApi,
   createComment as createCommentApi,
   updateComment as updateCommentApi,
   deleteComment as deleteCommentApi,
 } from "../api/comments_api";
 
-interface CommentData {
-  id: string;
-  body: string;
-  parentId: string | null;
-  createdAt: string;
-  username: string; // Add username
-  userId: string; // Add userId
-}
+// interface CommentData {
+//   id: string;
+//   body: string;
+//   parentId: string | null;
+//   createdAt: string;
+//   username: string; // Add username
+//   userId: string; // Add userId
+// }
+// this is already imported from the API
 
 interface Props {
   commentsUrl: string;
   currentUserId: string;
 }
 
-const Comments = ({ commentsUrl, currentUserId }: Props) => {
+const CommentsPage = ({ commentsUrl, currentUserId }: Props) => {
   const [backendComments, setBackendComments] = useState<CommentData[]>([]);
   const [activeComment, setActiveComment] = useState<{
     id: string;
@@ -106,4 +107,4 @@ const Comments = ({ commentsUrl, currentUserId }: Props) => {
   );
 };
 
-export default Comments;
+export default CommentsPage;
