@@ -1,6 +1,6 @@
 // commentFunctions.tsx
 
-export interface Comment {
+export default interface CommentData {
   id: string;
   body: string;
   username: string;
@@ -9,7 +9,7 @@ export interface Comment {
   createdAt: string;
 }
 
-export const getComments = async (): Promise<Comment[]> => {
+export const getComments = async (): Promise<CommentData[]> => {
   return [
     {
       id: "1",
@@ -49,7 +49,7 @@ export const getComments = async (): Promise<Comment[]> => {
 export const createComment = async (
   text: string,
   parentId: string | null = null
-): Promise<Comment> => {
+): Promise<CommentData> => {
   return {
     id: Math.random().toString(36).substr(2, 9),
     body: text,
