@@ -21,6 +21,9 @@ textarea {
   /* FONTS */
   --FF: 'Poppins', sans-serif;
   --FW: 600;
+
+  /* COLORS */
+  --CLR-BG: #a7bcff;
 }
 
 /* UTILITY CLASSES */
