@@ -92,10 +92,22 @@
   height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: center !important;
+  justify-content: center;
 
   .container {
     border: 1px solid white;
     border-radius: 10px;
+    width: 65%;
+    height: 80%;
+    display: flex;
+  }
+
+  .sidebar {
+    flex: 1;
+    border-right: 1px solid #3e3c61;
+  }
+
+  .chat {
+    flex: 2;
   }
 }
