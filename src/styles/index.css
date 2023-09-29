@@ -24,6 +24,10 @@ textarea {
 
   /* COLORS */
   --CLR-BG: #a7bcff;
+  --CLR-BG-DARK: #5d5b8d;
+  --CLR-BG-DARKER: #3e3c61;
+  --CLR-BG-DARKEST: #2f2d52;
+  --CLR-FONT: #ddddf7;
 }
 
 /* UTILITY CLASSES */
