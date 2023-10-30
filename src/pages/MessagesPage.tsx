@@ -1,7 +1,7 @@
 import React from "react";
 import Sidebar from "../components/messages/Sidebar";
-import Chat from "../components/messages/Chat";
 import "../styles/scss/messages.scss"
+import Chat from "../components/messages/Chat";
 
 const MessagesPage = () => {
   return (
