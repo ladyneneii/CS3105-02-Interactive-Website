@@ -14,6 +14,24 @@
   }
 }
 
+@mixin mobile {
+  @media screen and (max-width: 480px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media screen and (max-width: 768px) {
+    @content;
+  }
+}
+
+@mixin laptop {
+  @media screen and (max-width: 1200px) {
+    @content;
+  }
+}
+
 .formContainer {
   background-color: var(--CLR-BG);
   height: 100vh;
@@ -101,6 +119,10 @@
     display: flex;
     padding: 0;
     overflow: hidden;
+
+    @include tablet {
+      width: 90%;
+    }
   }
 
   .sidebar {
@@ -119,6 +141,10 @@
 
       .logo {
         font-weight: bold;
+
+        @include tablet {
+          display: none;
+        }
       }
 
       .user {
@@ -294,7 +320,7 @@
         font-size: 18px;
 
         &::placeholder {
-          color: lightgray
+          color: lightgray;
         }
       }
 
