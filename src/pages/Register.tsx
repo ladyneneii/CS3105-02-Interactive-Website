@@ -10,7 +10,6 @@ import "../styles/index.css";
 import Button from "../components/Button";
 import { Link } from "react-router-dom";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth, storage } from "../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
@@ -91,48 +90,8 @@ const Register = () => {
       return;
     }
 
-    try {
-      const res = await createUserWithEmailAndPassword(auth, email, pwd);
-
-      // user.png, yaskween.png, ladyneneii.png
-      const storageRef = ref(storage, user);
-
-      const uploadTask = uploadBytesResumable(storageRef, file);
-
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log("Upload is " + progress + "% done");
-          switch (snapshot.state) {
-            case "paused":
-              console.log("Upload is paused");
-              break;
-            case "running":
-              console.log("Upload is running");
-              break;
-          }
-        },
-        (error) => {
-          setErrMsg("Error uploading display picture.");
-          console.log(error);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-            await updateProfile(res.user, {
-              displayName: user,
-              photoURL: downloadURL,
-            });
-          });
-        }
-      );
-
-      // console.log(user, email, pwd);
-      setSuccess(true);
-    } catch (err) {
-      setErrMsg("Something went wrong. Try again.");
-    }
+    // console.log(user, email, pwd);
+    setSuccess(true);
   };
 
   return (
