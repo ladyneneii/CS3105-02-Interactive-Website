@@ -3,12 +3,12 @@ import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAdg_HP-7S30Uc32r19AAhqIKbPpLsQlcg",
-  authDomain: "padayon-df7dd.firebaseapp.com",
-  projectId: "padayon-df7dd",
-  storageBucket: "padayon-df7dd.appspot.com",
-  messagingSenderId: "397961580325",
-  appId: "1:397961580325:web:c224f96c1abde4cebf54cc",
+  apiKey: "AIzaSyBrwP_oeRvUTd_D4ouZDsSQkPAoTojqsTs",
+  authDomain: "padayon-2.firebaseapp.com",
+  projectId: "padayon-2",
+  storageBucket: "padayon-2.appspot.com",
+  messagingSenderId: "424845286413",
+  appId: "1:424845286413:web:18ab7c744811922fec4944",
 };
 
 // Initialize Firebase
