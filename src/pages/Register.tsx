@@ -11,6 +11,7 @@ import Button from "../components/Button";
 import { Link } from "react-router-dom";
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
+const EMAIL_REGEX = /^\S+@\S+\.\S+$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%_=+]).{8,24}$/;
 
 const Register = () => {
@@ -21,6 +22,10 @@ const Register = () => {
   const [validName, setValidName] = useState(false);
   const [userFocus, setUserFocus] = useState(false);
 
+  const [email, setEmail] = useState("");
+  const [validEmail, setValidEmail] = useState(false);
+  const [emailFocus, setEmailFocus] = useState(false);
+
   const [pwd, setPwd] = useState("");
   const [validPwd, setValidPwd] = useState(false);
   const [pwdFocus, setPwdFocus] = useState(false);
@@ -28,6 +33,8 @@ const Register = () => {
   const [matchPwd, setMatchPwd] = useState("");
   const [validMatch, setValidMatch] = useState(false);
   const [matchFocus, setMatchFocus] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
@@ -38,15 +45,22 @@ const Register = () => {
 
   useEffect(() => {
     const result = USER_REGEX.test(user);
-    console.log(result);
-    console.log(user);
+    // console.log(result);
+    // console.log(user);
     setValidName(result);
   }, [user]);
 
   useEffect(() => {
+    const result = EMAIL_REGEX.test(email);
+    // console.log(result);
+    // console.log(email);
+    setValidEmail(result);
+  }, [email]);
+
+  useEffect(() => {
     const result = PWD_REGEX.test(pwd);
-    console.log(result);
-    console.log(pwd);
+    // console.log(result);
+    // console.log(pwd);
     setValidPwd(result);
 
     const match = pwd === matchPwd;
@@ -61,12 +75,20 @@ const Register = () => {
     e.preventDefault();
     // if button enabled with JS hack
     const v1 = USER_REGEX.test(user);
-    const v2 = PWD_REGEX.test(pwd);
-    if (!v1 || !v2) {
+    const v2 = EMAIL_REGEX.test(email);
+    const v3 = PWD_REGEX.test(pwd);
+    const file = fileInputRef.current?.files?.[0];
+    if (!v1 || !v2 || !v3) {
       setErrMsg("Invalid Entry");
       return;
     }
-    console.log(user, pwd);
+
+    if (!file) {
+      setErrMsg("Please select a file.");
+      return;
+    }
+
+    // console.log(user, email, pwd);
     setSuccess(true);
   };
 
@@ -135,6 +157,53 @@ const Register = () => {
                   4 to 24 characters.
                   <br />
                   Must begin with a letter.
+                  <br />
+                  Letters, numbers, underscores, hyphens allowed.
+                </p>
+              </div>
+
+              {/* email */}
+              <div className="mb-3">
+                <label htmlFor="email" className="form-label">
+                  Email:
+                  <FontAwesomeIcon
+                    icon={faCheck}
+                    className={`custom-check-icon ${
+                      validEmail ? "valid" : "hide"
+                    }`}
+                  />
+                  <FontAwesomeIcon
+                    icon={faTimes}
+                    className={`custom-times-icon ${
+                      validEmail || !email ? "hide" : "invalid"
+                    }`}
+                  />
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  autoComplete="off"
+                  onChange={(e) => setEmail(e.target.value)}
+                  value={email}
+                  required
+                  aria-invalid={validEmail ? "false" : "true"}
+                  aria-describedby="eidnote"
+                  onFocus={() => setEmailFocus(true)} // input has focus
+                  onBlur={() => setEmailFocus(false)} // input doesn't have focus anymore
+                  className="form-control"
+                />
+                <p
+                  id="eidnote"
+                  className={
+                    emailFocus && email && !validEmail
+                      ? "instructions"
+                      : "offscreen"
+                  }
+                >
+                  <FontAwesomeIcon icon={faInfoCircle} />
+                  Must have an @ symbol followed by a domain name.
+                  <br />
+                  No spaces allowed.
                   <br />
                   Letters, numbers, underscores, hyphens allowed.
                 </p>
@@ -227,6 +296,20 @@ const Register = () => {
                   <FontAwesomeIcon icon={faInfoCircle} />
                   Must match the first password input field.
                 </p>
+              </div>
+
+              {/* Upload Picture */}
+              <div className="mb-3">
+                <label htmlFor="display-pic" className="form-label">
+                  Upload display picture:
+                </label>
+                <input
+                  type="file"
+                  className="form-control"
+                  id="display-pic"
+                  required
+                  ref={fileInputRef}
+                />
               </div>
 
               {/* Button */}

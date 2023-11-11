@@ -31,6 +31,7 @@ const CommentsPage = ({ commentsUrl, currentUserId }: Props) => {
     type: string;
   } | null>(null);
 
+
   const rootComments = backendComments.filter(
     (backendComment) => backendComment.parentId === null
   );
