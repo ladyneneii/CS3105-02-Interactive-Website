@@ -4,6 +4,9 @@ import SignIn from "./pages/SignIn";
 import MainPage from "./pages/MainPage";
 import CommentsPage from "./pages/CommentsPage";
 import MessagesPage from "./pages/MessagesPage";
+import io from "socket.io-client";
+
+const socket = io("http://localhost:3001");
 
 const App = () => {
   return (
