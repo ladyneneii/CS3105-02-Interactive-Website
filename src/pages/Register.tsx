@@ -182,7 +182,6 @@ const Register = () => {
                 <input
                   type="email"
                   id="email"
-                  ref={userRef}
                   autoComplete="off"
                   onChange={(e) => setEmail(e.target.value)}
                   value={email}

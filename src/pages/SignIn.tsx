@@ -4,8 +4,6 @@ import "../styles/index.css";
 import Button from "../components/Button";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { privateKey } from "../functions/constants";
 
 const EMAIL_REGEX = /^\S+@\S+\.\S+$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%_=+]).{8,24}$/;
@@ -39,27 +37,7 @@ const SignIn = () => {
     }
     // console.log(email, pwd);
     localStorage.setItem("email", email);
-
-    // add users to chatengine.com
-    const r = await axios
-      .put(
-        "https://api.chatengine.io/users/",
-        {
-          username: email,
-          secret: email,
-          first_name: email,
-        },
-        { headers: { "private-key": "d3f3d43c-732d-4846-a1c1-dbc7a726c213" } }
-      )
-      .then((r) => {
-        if (r.status === 201) {
-          navigate("/MainPage");
-        } else {
-          console.log("duplicate email");
-          navigate("/MainPage");
-        }
-      })
-      .catch((e) => console.log("Error", e));
+    navigate("/MainPage");
   };
 
   return (
