@@ -67,6 +67,11 @@ const Navbar = () => {
                 Comments
               </Link>
             </li>
+            <li className="nav-item">
+              <Link to="/MessagesPage" className="nav-link">
+                Messages
+              </Link>
+            </li>
           </ul>
           <form className="d-flex" role="search">
             <input

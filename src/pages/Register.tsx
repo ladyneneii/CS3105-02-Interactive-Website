@@ -9,8 +9,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/index.css";
 import Button from "../components/Button";
 import { Link } from "react-router-dom";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
 const EMAIL_REGEX = /^\S+@\S+\.\S+$/;

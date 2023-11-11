@@ -3,6 +3,7 @@ import Register from "./pages/Register";
 import SignIn from "./pages/SignIn";
 import MainPage from "./pages/MainPage";
 import CommentsPage from "./pages/CommentsPage";
+import MessagesPage from "./pages/MessagesPage";
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
               <CommentsPage commentsUrl="placeholder" currentUserId="1" />
             }
           />
+          <Route path="/MessagesPage" element={<MessagesPage />} />
         </Routes>
       </Router>
     </main>
