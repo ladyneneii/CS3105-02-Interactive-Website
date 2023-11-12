@@ -9,6 +9,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/index.css";
 import Button from "../components/Button";
 import { Link } from "react-router-dom";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth, storage } from "../firebase";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
 const EMAIL_REGEX = /^\S+@\S+\.\S+$/;
@@ -88,8 +91,85 @@ const Register = () => {
       return;
     }
 
-    // console.log(user, email, pwd);
-    setSuccess(true);
+    const formData = new FormData();
+
+    formData.append("Username", user);
+    formData.append("Email", email);
+    formData.append("Password", pwd);
+    formData.append("avatar_url", file);
+    formData.append("Role", "nmhp");
+    formData.append(
+      "register_date",
+      new Date().toISOString().slice(0, 19).replace("T", " ")
+    );
+    formData.append("State", "Active");
+
+    try {
+      // Make a POST request to server endpoint
+      const response = await fetch("http://localhost:3001/api/users", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        console.log("User added successfully!");
+      } else {
+        console.error("Failed to add user to the database");
+        setErrMsg("Failed to add user to the database");
+
+        return;
+      }
+    } catch (error) {
+      console.error("Error during POST request:", error);
+      setErrMsg("Error during POST request:");
+
+      return;
+    }
+
+    // firebase
+    try {
+      const res = await createUserWithEmailAndPassword(auth, email, pwd);
+
+      // user.png, yaskween.png, ladyneneii.png
+      const storageRef = ref(storage, user);
+
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("Upload is " + progress + "% done");
+          switch (snapshot.state) {
+            case "paused":
+              console.log("Upload is paused");
+              break;
+            case "running":
+              console.log("Upload is running");
+              break;
+          }
+        },
+        (error) => {
+          setErrMsg("Error uploading display picture.");
+          console.log(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+            await updateProfile(res.user, {
+              displayName: user,
+              photoURL: downloadURL,
+            });
+          });
+        }
+      );
+
+      console.log("Avatar uploaded successfully.");
+      // console.log(user, email, pwd);
+      setSuccess(true);
+    } catch (err) {
+      setErrMsg("Something went wrong. Try again.");
+    }
   };
 
   return (
