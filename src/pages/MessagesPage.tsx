@@ -6,9 +6,10 @@ import "../styles/pages/style.css";
 const socket = io("http://localhost:3001");
 
 const MessagesPage = () => {
-  const [username, setUsername] = useState("");
+  // const [username, setUsername] = useState("");
   const [room, setRoom] = useState("");
   const [showChat, setShowChat] = useState(false);
+  const username = localStorage.getItem("username") || "";
 
   const joinRoom = () => {
     if (username !== "" && room !== "") {
@@ -22,13 +23,13 @@ const MessagesPage = () => {
       {!showChat ? (
         <div className="joinChatContainer">
           <h3>Join a chat</h3>
-          <input
+          {/* <input
             type="text"
             placeholder="John..."
             onChange={(e) => {
               setUsername(e.target.value);
             }}
-          />
+          /> */}
           <input
             type="text"
             placeholder="Room ID..."

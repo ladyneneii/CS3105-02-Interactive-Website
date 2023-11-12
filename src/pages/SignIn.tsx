@@ -38,14 +38,29 @@ const SignIn = () => {
 
     // Make a request here to /api/users to get the record with the inputted email and pwd (if it exists)
     try {
-      // Make a POST request to server endpoint
       const response = await fetch(`http://localhost:3001/api/users/${email},${pwd}`);
 
       if (response.ok) {
-        console.log("User retrieved successfully!");
-        // console.log(email, pwd);
-        localStorage.setItem("email", email);
-        navigate("/MainPage");
+        const {Role, State, Username, avatar_url} = await response.json()
+
+        if (State === "Active") {
+          console.log("User retrieved successfully!");
+          // console.log(email, pwd);
+          localStorage.setItem("username", Username);
+          navigate("/MainPage");
+  
+          // successful login here
+        } else {
+          if (State === "Pending") {
+            setErrMsg(
+              "Your account is currently pending. Please wait for the admins to approve your account."
+            );
+          } else {
+            setErrMsg(
+              "Your account is blocked."
+            );
+          }
+        }
       } else {
         console.error("User does not exist. Please create an account.");
         setErrMsg("User does not exist. Please create an account.");

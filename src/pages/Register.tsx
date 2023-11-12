@@ -104,6 +104,45 @@ const Register = () => {
     );
     formData.append("State", "Active");
 
+    // Make a request here to /api/users to get the record with the inputted user (if it exists)
+    try {
+      const response = await fetch(`http://localhost:3001/api/username_check/${user}`);
+
+      if (response.ok) {
+        console.log("This is a unique username.");
+      } else {
+        console.error("This username already exists.");
+        setErrMsg("This username already exists.");
+
+        return;
+      }
+    } catch (error) {
+      console.error("Error during GET request:", error);
+      setErrMsg("Error during GET request:");
+
+      return;
+    }
+
+    // Make a request here to /api/users to get the record with the inputted email (if it exists)
+    try {
+      const response = await fetch(`http://localhost:3001/api/email_check/${email}`);
+
+      if (response.ok) {
+        console.log("This is a unique email.");
+      } else {
+        console.error("This email already exists.");
+        setErrMsg("This email already exists.");
+
+        return;
+      }
+    } catch (error) {
+      console.error("Error during GET request:", error);
+      setErrMsg("Error during GET request:");
+
+      return;
+    }
+
+    // add data to database
     try {
       // Make a POST request to server endpoint
       const response = await fetch("http://localhost:3001/api/users", {
