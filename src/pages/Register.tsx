@@ -106,7 +106,9 @@ const Register = () => {
 
     // Make a request here to /api/users to get the record with the inputted user (if it exists)
     try {
-      const response = await fetch(`http://localhost:3001/api/username_check/${user}`);
+      const response = await fetch(
+        `http://localhost:3001/api/username_check/${user}`
+      );
 
       if (response.ok) {
         console.log("This is a unique username.");
@@ -125,7 +127,9 @@ const Register = () => {
 
     // Make a request here to /api/users to get the record with the inputted email (if it exists)
     try {
-      const response = await fetch(`http://localhost:3001/api/email_check/${email}`);
+      const response = await fetch(
+        `http://localhost:3001/api/email_check/${email}`
+      );
 
       if (response.ok) {
         console.log("This is a unique email.");
