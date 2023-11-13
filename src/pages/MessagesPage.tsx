@@ -1,19 +1,44 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import io from "socket.io-client";
 import Chat from "../components/Chat";
 import "../styles/pages/style.css";
 
 const socket = io("http://localhost:3001");
 
+interface RoomProps {
+  Members: string;
+  Password: string;
+  State: "Active" | "Blocked" | "Archived" | "Pending";
+  Title: String;
+  room_id: number;
+}
+
 const MessagesPage = () => {
   // const [username, setUsername] = useState("");
   const [room, setRoom] = useState("");
   const [pwd, setPwd] = useState("");
   const [showChat, setShowChat] = useState(false);
-  const username = localStorage.getItem("username") || "";
+  const [roomObject, setRoomObject] = useState<RoomProps | undefined>()
+  let username: string | null = null;
+  const unparsed_user_details = localStorage.getItem("user_details");
+
+  useEffect(() => {
+    if (roomObject) {
+      setShowChat(true);
+    } else {
+      console.error("Failed to retrieve room_object json.");
+    }
+  }, [roomObject]);
+
+  if (unparsed_user_details) {
+    username = JSON.parse(unparsed_user_details)?.Username;
+  } else {
+    console.log("No user_details retrieved.");
+  }
 
   const joinRoom = async () => {
-    if (username !== "" && room !== "" && pwd !== "") {
+    if (username !== null && room !== "" && pwd !== "") {
+      console.log("helloooo");
       // add data to database
       try {
         const formData = new FormData();
@@ -36,11 +61,16 @@ const MessagesPage = () => {
 
         if (response.ok) {
           console.log("Room added successfully!");
+          const [room_object] = await response.json();
+          console.log(room_object);
+          console.log("This is room_id: ", room_object.room_id);
 
           socket.emit("join_room", room);
-          setShowChat(true);
+          setRoomObject(room_object);
         } else {
-          console.error("Failed to add room to the database");
+          console.error(
+            "Failed to add room to the database or fetch room from the database."
+          );
           console.log(response);
 
           return;
@@ -50,6 +80,8 @@ const MessagesPage = () => {
 
         return;
       }
+    } else {
+      console.log("ERROR");
     }
   };
 
@@ -75,7 +107,12 @@ const MessagesPage = () => {
           <button onClick={joinRoom}>Join a room</button>
         </div>
       ) : (
-        <Chat socket={socket} username={username} room={room} />
+        <Chat
+          socket={socket}
+          username={username}
+          room={room}
+          room_id={roomObject?.room_id}
+        />
       )}
     </div>
   );

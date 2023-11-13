@@ -38,27 +38,45 @@ const SignIn = () => {
 
     // Make a request here to /api/users to get the record with the inputted email and pwd (if it exists)
     try {
-      const response = await fetch(`http://localhost:3001/api/users/${email},${pwd}`);
+      const response = await fetch(
+        `http://localhost:3001/api/users/${email},${pwd}`
+      );
 
       if (response.ok) {
-        const {Role, State, Username, avatar_url} = await response.json()
+        const [user_object] = await response.json();
+        const {
+          Email,
+          Role,
+          State,
+          Username,
+          avatar_url,
+          register_date,
+          user_id,
+        } = user_object;
+        const user_object_localstorage = {
+          Email,
+          Role,
+          State,
+          Username,
+          avatar_url,
+          register_date,
+          user_id,
+        };
 
         if (State === "Active") {
           console.log("User retrieved successfully!");
-          // console.log(email, pwd);
-          localStorage.setItem("username", Username);
+
+          localStorage.setItem("user_details", JSON.stringify(user_object_localstorage));
           navigate("/MainPage");
-  
+
           // successful login here
         } else {
           if (State === "Pending") {
             setErrMsg(
               "Your account is currently pending. Please wait for the admins to approve your account."
             );
-          } else {
-            setErrMsg(
-              "Your account is blocked."
-            );
+          } else if (State === "Blocked") {
+            setErrMsg("Your account is blocked.");
           }
         }
       } else {
@@ -125,7 +143,7 @@ const SignIn = () => {
               onClick={handleSubmit}
               disabled={!email || !pwd}
             >
-              Sign Up
+              Sign In
             </Button>
           </form>
           {/* END OF FORM */}
