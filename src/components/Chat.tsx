@@ -11,16 +11,40 @@ interface ChatProps {
 interface MessageProps {
   room_id: number | undefined;
   user_id: number;
-  room: string;
-  author: string | null;
+  Username: string | null;
   Content: string;
   date_time: string;
   message_reply_id: number | null;
+  message_reply_username: string | null;
 }
 
 const Chat = ({ socket, username, room, room_id }: ChatProps) => {
   const [currentMessage, setCurrentMessage] = useState("");
   const [messageList, setMessageList] = useState<MessageProps[]>([]);
+
+  // retrieve all messages in room_id from the database
+  useEffect(() => {
+    const fetchData = async (room_id: number | undefined) => {
+      try {
+        const response = await fetch(
+          `http://localhost:3001/api/rooms/${room_id}`
+        );
+
+        if (response.ok) {
+          const messages_object = await response.json();
+
+          console.log(messages_object);
+          setMessageList(messages_object);
+        } else {
+          console.error(`Error retrieving messages in room id: ${room_id}`);
+        }
+      } catch (error) {
+        console.error("Error during GET request:", error);
+      }
+    };
+
+    fetchData(room_id);
+  }, []);
 
   const sendMessage = async () => {
     if (currentMessage !== "") {
@@ -31,18 +55,19 @@ const Chat = ({ socket, username, room, room_id }: ChatProps) => {
         const messageData: MessageProps = {
           room_id,
           user_id: user_details.user_id,
-          room,
-          author: username,
+          Username: username,
           Content: currentMessage,
           date_time:
             new Date(Date.now()).getHours() +
             ":" +
             new Date(Date.now()).getMinutes(),
           message_reply_id: null,
+          message_reply_username: null,
         };
 
-        console.log("This is messageData ", messageData);
-  
+        // console.log("This is messageData ", messageData);
+        console.log("This is messageList ", messageList);
+
         await socket.emit("send_message", messageData);
         // also add your own message to your end
         setMessageList((list) => [...list, messageData]);
@@ -79,11 +104,11 @@ const Chat = ({ socket, username, room, room_id }: ChatProps) => {
       <div className="chat-body">
         <ScrollToBottom className="message-container">
           {messageList.map((messageContent: MessageProps, index) => {
-            const { author, Content, date_time } = messageContent;
+            const { Username, Content, date_time } = messageContent;
             return (
               <div
                 className="message"
-                id={username === author ? "you" : "other"}
+                id={username === Username ? "you" : "other"}
                 key={index}
               >
                 <div>
@@ -92,7 +117,7 @@ const Chat = ({ socket, username, room, room_id }: ChatProps) => {
                   </div>
                   <div className="message-meta">
                     <p id="time">{date_time}</p>
-                    <p id="author">{author}</p>
+                    <p id="author">{Username}</p>
                   </div>
                 </div>
               </div>
