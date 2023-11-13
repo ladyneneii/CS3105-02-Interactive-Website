@@ -65,7 +65,7 @@ const MessagesPage = () => {
           console.log(room_object);
           console.log("This is room_id: ", room_object.room_id);
 
-          socket.emit("join_room", room);
+          socket.emit("join_room", room_object.room_id);
           setRoomObject(room_object);
         } else {
           console.error(
