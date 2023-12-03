@@ -4,9 +4,17 @@ import Navbar from "../components/Navbar";
 import "leaflet/dist/leaflet.css"; // Import Leaflet CSS
 import L from "leaflet";
 
-interface LocationProps {
+interface PositionProps {
   coords: { latitude: number; longitude: number };
   timestamp: number;
+}
+
+interface LocationProps {
+  location_id: number;
+  user_id: number;
+  Latitude: number;
+  Longitude: number;
+  Address: string;
 }
 
 const MainPage = () => {
@@ -14,12 +22,9 @@ const MainPage = () => {
   const mapRef = useRef<L.Map | null>(null); // Create a ref for the map
 
   useEffect(() => {
-    console.log("beginning of useEffect");
-
     const initializeMap = () => {
       if (!mapRef.current) {
         mapRef.current = L.map("nearYouMap").setView([0, 0], 1); // Use the ref
-
         const attribution =
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
         const tileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -27,11 +32,10 @@ const MainPage = () => {
         tiles.addTo(mapRef.current); // Use the ref
 
         const marker = L.marker([0, 0]).addTo(mapRef.current); // Use the ref
-        const marker2 = L.marker([0, 0]).addTo(mapRef.current); // Use the ref
 
         let firstTime = true;
 
-        const getPosition = async (position: LocationProps) => {
+        const getPosition = async (position: PositionProps) => {
           console.log("inside of getPosition");
           // Ask for location
           const latitude = position.coords.latitude || 0;
@@ -41,8 +45,8 @@ const MainPage = () => {
             mapRef.current?.setView([latitude, longitude], 19); // Use the ref
             firstTime = false;
           }
+
           marker.setLatLng([latitude, longitude]);
-          marker2.setLatLng([latitude - 1, longitude]);
 
           console.log(latitude, longitude);
 
@@ -64,18 +68,45 @@ const MainPage = () => {
               const response = await fetch(
                 "http://localhost:3001/api/locations",
                 {
-                  method: "POST",
+                  method: "PUT",
                   body: formData,
                 }
               );
 
               if (response.ok) {
-                console.log("Location added successfully!");
+                const res = await response.text();
+                console.log(res);
               } else {
-                console.error("Failed to add location to the database");
+                console.error("Failed to add/update location to the database");
               }
             } catch (error) {
               console.error("Error during POST request:", error);
+            }
+
+            // get all locations from the database
+            try {
+              const response = await fetch(
+                "http://localhost:3001/api/locations"
+              );
+
+              if (response.ok) {
+                const locations_json = await response.json();
+                console.log(locations_json);
+
+                locations_json.forEach((location: LocationProps) => {
+                  const { Latitude, Longitude } = location;
+
+                  if (mapRef.current) {
+                    const otherMarker = L.marker([0, 0]).addTo(mapRef.current); // Use the ref
+
+                    otherMarker.setLatLng([Latitude, Longitude]);
+                  }
+                });
+              } else {
+                console.error("Failed to retrieve all locations");
+              }
+            } catch (error) {
+              console.error("Error during GET request:", error);
             }
           } else {
             console.log("No user_details retrieved.");
