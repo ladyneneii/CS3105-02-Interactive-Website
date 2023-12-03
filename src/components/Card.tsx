@@ -43,7 +43,7 @@ const Card = ({ load }: Props) => {
       setIsLoading(true);
     }, load);
 
-    console.log(textWidth, textHeight);
+    // console.log(textWidth, textHeight);
   }, [load]);
 
   return (

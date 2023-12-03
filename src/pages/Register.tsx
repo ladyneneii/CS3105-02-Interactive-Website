@@ -37,6 +37,8 @@ const Register = () => {
   const [validMatch, setValidMatch] = useState(false);
   const [matchFocus, setMatchFocus] = useState(false);
 
+  const selectedRadioButton = useRef<HTMLInputElement | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [errMsg, setErrMsg] = useState("");
@@ -91,13 +93,18 @@ const Register = () => {
       return;
     }
 
+    if (!selectedRadioButton.current) {
+      setErrMsg("Please select a user type.");
+      return;
+    }
+
     const formData = new FormData();
 
     formData.append("Username", user);
     formData.append("Email", email);
     formData.append("Password", pwd);
     formData.append("avatar_url", file);
-    formData.append("Role", "nmhp");
+    formData.append("Role", selectedRadioButton.current.id === "nmhp" ? "nmhp" : "mhp");
     formData.append(
       "register_date",
       new Date().toISOString().slice(0, 19).replace("T", " ")
@@ -419,6 +426,38 @@ const Register = () => {
                   <FontAwesomeIcon icon={faInfoCircle} />
                   Must match the first password input field.
                 </p>
+              </div>
+
+              {/* Mental health professional or not */}
+              <div className="mb-3">
+                <label htmlFor="user-type" className="form-label">
+                  Type of User:
+                </label>
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    name="userType"
+                    id="nmhp"
+                    ref={selectedRadioButton}
+                    checked
+                  />
+                  <label className="form-check-label" htmlFor="nmhp_label">
+                    I am not a mental health professional.
+                  </label>
+                </div>
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    name="userType"
+                    id="mhp"
+                    ref={selectedRadioButton}
+                  />
+                  <label className="form-check-label" htmlFor="mhp_label">
+                    I am a mental health professional.
+                  </label>
+                </div>
               </div>
 
               {/* Upload Picture */}
