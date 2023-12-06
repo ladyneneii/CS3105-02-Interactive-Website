@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, ChangeEvent } from "react";
 import {
   faCheck,
   faTimes,
@@ -18,7 +18,7 @@ const EMAIL_REGEX = /^\S+@\S+\.\S+$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%_=+]).{8,24}$/;
 
 const Register = () => {
-  const userRef = useRef<HTMLInputElement | null>(null);
+  const firstNameRef = useRef<HTMLInputElement | null>(null);
   const errRef = useRef<HTMLDivElement | null>(null);
 
   const [user, setUser] = useState("");
@@ -37,7 +37,7 @@ const Register = () => {
   const [validMatch, setValidMatch] = useState(false);
   const [matchFocus, setMatchFocus] = useState(false);
 
-  const selectedRadioButton = useRef<HTMLInputElement | null>(null);
+  const [selectedUserType, setSelectedUserType] = useState("nmhp");
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -45,7 +45,7 @@ const Register = () => {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    userRef.current?.focus();
+    firstNameRef.current?.focus();
   }, []);
 
   useEffect(() => {
@@ -76,6 +76,10 @@ const Register = () => {
     setErrMsg("");
   }, [user, pwd, matchPwd]);
 
+ const handleUserTypeChange = (e: ChangeEvent<HTMLInputElement>) => {
+   setSelectedUserType(e.target.value);
+ };
+
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     // if button enabled with JS hack
@@ -93,8 +97,23 @@ const Register = () => {
       return;
     }
 
-    if (!selectedRadioButton.current) {
-      setErrMsg("Please select a user type.");
+    const firstName = (document.querySelector("#firstName") as HTMLInputElement)
+      .value;
+    const middleName = (
+      document.querySelector("#middleName") as HTMLInputElement | null
+    )?.value;
+    const lastName = (document.querySelector("#lastName") as HTMLInputElement)
+      .value;
+    const age = (document.querySelector("#age") as HTMLInputElement).value;
+    const gender = (
+      document.querySelector("#gender") as HTMLSelectElement | null
+    )?.value;
+    const pronouns = (
+      document.querySelector("#pronouns") as HTMLInputElement | null
+    )?.value;
+
+    if (parseInt(age, 10) <= 0) {
+      setErrMsg("Please enter a valid age.");
       return;
     }
 
@@ -104,12 +123,21 @@ const Register = () => {
     formData.append("Email", email);
     formData.append("Password", pwd);
     formData.append("avatar_url", file);
-    formData.append("Role", selectedRadioButton.current.id === "nmhp" ? "nmhp" : "mhp");
+    formData.append(
+      "Role",
+      selectedUserType
+    );
     formData.append(
       "register_date",
       new Date().toISOString().slice(0, 19).replace("T", " ")
     );
     formData.append("State", "Active");
+    formData.append("first_name", firstName);
+    formData.append("middle_name", middleName || "n/a");
+    formData.append("last_name", lastName);
+    formData.append("age", age);
+    formData.append("gender", gender || "n/a");
+    formData.append("pronouns", pronouns || "n/a");
 
     // Make a request here to /api/users to get the record with the inputted user (if it exists)
     try {
@@ -244,6 +272,46 @@ const Register = () => {
             <h1>Register</h1>
             {/* START OF FORM */}
             <form>
+              {/* first name */}
+              <div className="mb-3">
+                <label htmlFor="firstName" className="form-label">
+                  First Name:
+                </label>
+                <input
+                  type="text"
+                  id="firstName"
+                  ref={firstNameRef}
+                  required
+                  className="form-control"
+                />
+              </div>
+
+              {/* middle name */}
+              <div className="mb-3">
+                <label htmlFor="middleName" className="form-label">
+                  Middle Name:
+                </label>
+                <input
+                  type="text"
+                  id="middleName"
+                  className="form-control"
+                  placeholder="Skip if you don't have any."
+                />
+              </div>
+
+              {/* last name */}
+              <div className="mb-3">
+                <label htmlFor="lastName" className="form-label">
+                  Last Name:
+                </label>
+                <input
+                  type="text"
+                  id="lastName"
+                  required
+                  className="form-control"
+                />
+              </div>
+
               {/* username */}
               <div className="mb-3">
                 <label htmlFor="username" className="form-label">
@@ -264,7 +332,6 @@ const Register = () => {
                 <input
                   type="text"
                   id="username"
-                  ref={userRef}
                   autoComplete="off"
                   onChange={(e) => setUser(e.target.value)}
                   value={user}
@@ -439,8 +506,9 @@ const Register = () => {
                     type="radio"
                     name="userType"
                     id="nmhp"
-                    ref={selectedRadioButton}
-                    checked
+                    value="nmhp"
+                    checked={selectedUserType === "nmhp"}
+                    onChange={handleUserTypeChange}
                   />
                   <label className="form-check-label" htmlFor="nmhp_label">
                     I am not a mental health professional.
@@ -452,11 +520,45 @@ const Register = () => {
                     type="radio"
                     name="userType"
                     id="mhp"
-                    ref={selectedRadioButton}
+                    value="mhp"
+                    checked={selectedUserType === "mhp"}
+                    onChange={handleUserTypeChange}
                   />
                   <label className="form-check-label" htmlFor="mhp_label">
                     I am a mental health professional.
                   </label>
+                </div>
+              </div>
+
+              {/* age, gender, pronouns */}
+              <div className="row">
+                <div className="mb-3 col">
+                  <label className="form-label">Age</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    id="age"
+                    required
+                  />
+                </div>
+
+                <div className="mb-3 col">
+                  <label className="form-label">Gender</label>
+                  <select className="form-select" id="gender">
+                    <option value="" disabled>
+                      Select your gender
+                    </option>
+                    <option value="Woman">Woman</option>
+                    <option value="Non-Binary">Non-Binary</option>
+                    <option value="Man">Man</option>
+                    <option value="Others">Others</option>
+                    <option value="PNTS">Prefer Not to Say</option>
+                  </select>
+                </div>
+
+                <div className="mb-3 col">
+                  <label className="form-label">Pronouns</label>
+                  <input type="text" className="form-control" id="pronouns" />
                 </div>
               </div>
 
