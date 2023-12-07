@@ -48,6 +48,18 @@ const Register = () => {
   // mental health professional verification
   const licenseNumberRef = useRef<HTMLInputElement | null>(null);
 
+  const [validLicenseNumber, setValidLicenseNumber] = useState(false);
+  const [validDisordersSpecialization, setValidDisordersSpecialization] =
+    useState(false);
+  const [validFees, setValidFees] = useState(false);
+  const [validYearsOfExperience, setValidYearsOfExperience] = useState(false);
+  const [validMinimumAge, setValidMinimumAge] = useState(false);
+  const [validMaximumAge, setValidMaximumAge] = useState(false);
+  const [validLanguages, setValidLanguages] = useState(false);
+  const [validAvailableDays, setValidAvailableDays] = useState(false);
+  const [validAvailableHours, setValidAvailableHours] = useState(false);
+  const [validContactNumber, setValidContactNumber] = useState(false);
+
   useEffect(() => {
     firstNameRef.current?.focus();
     licenseNumberRef.current?.focus();
@@ -85,6 +97,87 @@ const Register = () => {
     setSelectedUserType(e.target.value);
   };
 
+  // mental health professional verification
+  const disordersSpecializationCheckboxes = document.getElementById(
+    "disordersSpecializationCheckboxes"
+  );
+
+  if (disordersSpecializationCheckboxes) {
+    // Select all checkboxes within the disordersSpecializationCheckboxes
+    const checkboxes =
+      disordersSpecializationCheckboxes.querySelectorAll(".form-check-input");
+
+    checkboxes.forEach((checkbox) => {
+      checkbox.addEventListener("change", () => {
+        setValidDisordersSpecialization(
+          Array.from(checkboxes).some((cb) => (cb as HTMLInputElement).checked)
+        );
+      });
+    });
+  } else {
+    console.error(
+      "Element with id 'disordersSpecializationCheckboxes' not found."
+    );
+  }
+
+  const feesCheckboxes = document.getElementById("feesCheckboxes");
+
+  if (feesCheckboxes) {
+    // Select all checkboxes within the feesCheckboxes
+    const checkboxes = feesCheckboxes.querySelectorAll(".form-check-input");
+
+    checkboxes.forEach((checkbox) => {
+      checkbox.addEventListener("change", () => {
+        setValidFees(
+          Array.from(checkboxes).some((cb) => (cb as HTMLInputElement).checked)
+        );
+      });
+    });
+  } else {
+    console.error("Element with id 'feesCheckboxes' not found.");
+  }
+
+  const availableDaysCheckboxes = document.getElementById(
+    "availableDaysCheckboxes"
+  );
+
+  if (availableDaysCheckboxes) {
+    // Select all checkboxes within the availableDaysCheckboxes
+    const checkboxes =
+      availableDaysCheckboxes.querySelectorAll(".form-check-input");
+
+    checkboxes.forEach((checkbox) => {
+      checkbox.addEventListener("change", () => {
+        setValidAvailableDays(
+          Array.from(checkboxes).some((cb) => (cb as HTMLInputElement).checked)
+        );
+      });
+    });
+  } else {
+    console.error("Element with id 'availableDaysCheckboxes' not found.");
+  }
+
+  const availableHoursCheckboxes = document.getElementById(
+    "availableHoursCheckboxes"
+  );
+
+  if (availableHoursCheckboxes) {
+    // Select all checkboxes within the availableHoursCheckboxes
+    const checkboxes =
+      availableHoursCheckboxes.querySelectorAll(".form-check-input");
+
+    checkboxes.forEach((checkbox) => {
+      checkbox.addEventListener("change", () => {
+        setValidAvailableHours(
+          Array.from(checkboxes).some((cb) => (cb as HTMLInputElement).checked)
+        );
+      });
+    });
+  } else {
+    console.error("Element with id 'availableHoursCheckboxes' not found.");
+  }
+
+  // submit buttons
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     // if button enabled with JS hack
@@ -268,13 +361,14 @@ const Register = () => {
                   type="text"
                   id="licenseNumber"
                   ref={licenseNumberRef}
+                  onChange={() => setValidLicenseNumber(true)}
                   required
                   className="form-control"
                 />
               </div>
 
               {/* disorders specialization */}
-              <div className="mb-3">
+              <div className="mb-3" id="disordersSpecializationCheckboxes">
                 <label htmlFor="middleName" className="form-label">
                   Disorders Specialization:
                 </label>
@@ -449,7 +543,7 @@ const Register = () => {
               </div>
 
               {/* fees */}
-              <div className="row">
+              <div className="row" id="feesCheckboxes">
                 <label htmlFor="middleName" className="form-label">
                   Fees:
                 </label>
@@ -626,6 +720,11 @@ const Register = () => {
                     type="number"
                     className="form-control"
                     id="yearsOfExperience"
+                    onChange={(e) => {
+                      e.target.value === ""
+                        ? setValidYearsOfExperience(false)
+                        : setValidYearsOfExperience(true);
+                    }}
                     required
                   />
                 </div>
@@ -637,6 +736,11 @@ const Register = () => {
                     type="number"
                     className="form-control"
                     id="minimumAge"
+                    onChange={(e) => {
+                      e.target.value === ""
+                        ? setValidMinimumAge(false)
+                        : setValidMinimumAge(true);
+                    }}
                     required
                   />
                 </div>
@@ -648,6 +752,11 @@ const Register = () => {
                     type="number"
                     className="form-control"
                     id="maximumAge"
+                    onChange={(e) => {
+                      e.target.value === ""
+                        ? setValidMaximumAge(false)
+                        : setValidMaximumAge(true);
+                    }}
                     required
                   />
                 </div>
@@ -663,12 +772,17 @@ const Register = () => {
                   className="form-control"
                   id="languages"
                   placeholder="English, Filipino, Bisaya"
+                  onChange={(e) => {
+                    e.target.value === ""
+                      ? setValidLanguages(false)
+                      : setValidLanguages(true);
+                  }}
                   required
                 />
               </div>
 
               {/* available days */}
-              <div className="row">
+              <div className="row" id="availableDaysCheckboxes">
                 <label htmlFor="middleName" className="form-label">
                   Available Days:
                 </label>
@@ -763,7 +877,7 @@ const Register = () => {
               </div>
 
               {/* available hours */}
-              <div className="row">
+              <div className="row" id="availableHoursCheckboxes">
                 <label htmlFor="middleName" className="form-label">
                   Available Hours:
                 </label>
@@ -1072,6 +1186,11 @@ const Register = () => {
                   required
                   className="form-control"
                   placeholder="Add as many as you can. Any format will do."
+                  onChange={(e) => {
+                    e.target.value === ""
+                      ? setValidContactNumber(false)
+                      : setValidContactNumber(true);
+                  }}
                 />
               </div>
 
@@ -1090,7 +1209,18 @@ const Register = () => {
               <Button
                 color="primary"
                 onClick={handleSubmit}
-                disabled={!validName || !validPwd || !validMatch}
+                disabled={
+                  !validLicenseNumber ||
+                  !validDisordersSpecialization ||
+                  !validFees ||
+                  !validYearsOfExperience ||
+                  !validMinimumAge ||
+                  !validMaximumAge ||
+                  !validLanguages ||
+                  !validAvailableDays ||
+                  !validAvailableHours ||
+                  !validContactNumber
+                }
               >
                 Verify Professional Account
               </Button>
