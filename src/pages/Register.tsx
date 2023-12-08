@@ -14,6 +14,22 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, storage } from "../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
+interface UserProps {
+  Username: string;
+  Email: string;
+  Password: string;
+  avatar_url: File;
+  Role: "admin" | "mhp" | "nmhp";
+  register_date: string;
+  State: "Active" | "Pending" | "Blocked" | "Unverified";
+  first_name: string;
+  middle_name: string;
+  last_name: string;
+  age: string;
+  gender: string;
+  pronouns: string;
+}
+
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
 const EMAIL_REGEX = /^\S+@\S+\.\S+$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%_=+]).{8,24}$/;
@@ -133,28 +149,45 @@ const Register = () => {
     }
 
     const formData = new FormData();
+    const register_date = new Date()
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+    const state =
+      selectedUserType === "mhp" && notVerifiedProfessional
+        ? "Unverified"
+        : "Active";
 
     formData.append("Username", user);
     formData.append("Email", email);
     formData.append("Password", pwd);
     formData.append("avatar_url", file);
     formData.append("Role", selectedUserType);
-    formData.append(
-      "register_date",
-      new Date().toISOString().slice(0, 19).replace("T", " ")
-    );
-    formData.append(
-      "State",
-      selectedUserType === "mhp" && notVerifiedProfessional
-        ? "Unverified"
-        : "Active"
-    );
+    formData.append("register_date", register_date);
+    formData.append("State", state);
     formData.append("first_name", firstName);
     formData.append("middle_name", middleName || "n/a");
     formData.append("last_name", lastName);
     formData.append("age", age);
     formData.append("gender", gender || "n/a");
     formData.append("pronouns", pronouns || "n/a");
+
+    // for localStorage
+    const user_details: UserProps = {
+      Username: user,
+      Email: email,
+      Password: pwd,
+      avatar_url: file,
+      Role: selectedUserType as "admin" | "mhp" | "nmhp",
+      register_date,
+      State: state,
+      first_name: firstName,
+      middle_name: middleName || "n/a",
+      last_name: lastName,
+      age,
+      gender: gender || "n/a",
+      pronouns: pronouns || "n/a",
+    };
 
     // Make a request here to /api/users to get the record with the inputted user (if it exists)
     try {
@@ -208,6 +241,9 @@ const Register = () => {
 
       if (response.ok) {
         console.log("User added successfully!");
+
+        // add to localStorage
+        localStorage.setItem("user_details", JSON.stringify(user_details));
       } else {
         console.error("Failed to add user to the database");
         setErrMsg("Failed to add user to the database");
@@ -269,348 +305,329 @@ const Register = () => {
 
   return (
     <>
-      <section className="container-sm mt-5">
-        
-          <section>
+      <section className="container-sm my-5">
+        <p
+          ref={errRef}
+          className={errMsg ? "errmsg" : "offscreen"}
+          aria-live="assertive"
+        >
+          {errMsg}
+        </p>
+        <h1>Register</h1>
+        {/* START OF FORM */}
+        <form>
+          {/* first name */}
+          <div className="mb-3">
+            <label htmlFor="firstName" className="form-label">
+              First Name:
+            </label>
+            <input
+              type="text"
+              id="firstName"
+              ref={firstNameRef}
+              required
+              className="form-control"
+            />
+          </div>
+
+          {/* middle name */}
+          <div className="mb-3">
+            <label htmlFor="middleName" className="form-label">
+              Middle Name:
+            </label>
+            <input
+              type="text"
+              id="middleName"
+              className="form-control"
+              placeholder="Skip if you don't have any."
+            />
+          </div>
+
+          {/* last name */}
+          <div className="mb-3">
+            <label htmlFor="lastName" className="form-label">
+              Last Name:
+            </label>
+            <input
+              type="text"
+              id="lastName"
+              required
+              className="form-control"
+            />
+          </div>
+
+          {/* username */}
+          <div className="mb-3">
+            <label htmlFor="username" className="form-label">
+              Username:
+              <FontAwesomeIcon
+                icon={faCheck}
+                className={`custom-check-icon ${validName ? "valid" : "hide"}`}
+              />
+              <FontAwesomeIcon
+                icon={faTimes}
+                className={`custom-times-icon ${
+                  validName || !user ? "hide" : "invalid"
+                }`}
+              />
+            </label>
+            <input
+              type="text"
+              id="username"
+              autoComplete="off"
+              onChange={(e) => setUser(e.target.value)}
+              value={user}
+              required
+              aria-invalid={validName ? "false" : "true"}
+              aria-describedby="uidnote"
+              onFocus={() => setUserFocus(true)} // input has focus
+              onBlur={() => setUserFocus(false)} // input doesn't have focus anymore
+              className="form-control"
+            />
             <p
-              ref={errRef}
-              className={errMsg ? "errmsg" : "offscreen"}
-              aria-live="assertive"
+              id="uidnote"
+              className={
+                userFocus && user && !validName ? "instructions" : "offscreen"
+              }
             >
-              {errMsg}
-            </p>
-            <h1>Register</h1>
-            {/* START OF FORM */}
-            <form>
-              {/* first name */}
-              <div className="mb-3">
-                <label htmlFor="firstName" className="form-label">
-                  First Name:
-                </label>
-                <input
-                  type="text"
-                  id="firstName"
-                  ref={firstNameRef}
-                  required
-                  className="form-control"
-                />
-              </div>
-
-              {/* middle name */}
-              <div className="mb-3">
-                <label htmlFor="middleName" className="form-label">
-                  Middle Name:
-                </label>
-                <input
-                  type="text"
-                  id="middleName"
-                  className="form-control"
-                  placeholder="Skip if you don't have any."
-                />
-              </div>
-
-              {/* last name */}
-              <div className="mb-3">
-                <label htmlFor="lastName" className="form-label">
-                  Last Name:
-                </label>
-                <input
-                  type="text"
-                  id="lastName"
-                  required
-                  className="form-control"
-                />
-              </div>
-
-              {/* username */}
-              <div className="mb-3">
-                <label htmlFor="username" className="form-label">
-                  Username:
-                  <FontAwesomeIcon
-                    icon={faCheck}
-                    className={`custom-check-icon ${
-                      validName ? "valid" : "hide"
-                    }`}
-                  />
-                  <FontAwesomeIcon
-                    icon={faTimes}
-                    className={`custom-times-icon ${
-                      validName || !user ? "hide" : "invalid"
-                    }`}
-                  />
-                </label>
-                <input
-                  type="text"
-                  id="username"
-                  autoComplete="off"
-                  onChange={(e) => setUser(e.target.value)}
-                  value={user}
-                  required
-                  aria-invalid={validName ? "false" : "true"}
-                  aria-describedby="uidnote"
-                  onFocus={() => setUserFocus(true)} // input has focus
-                  onBlur={() => setUserFocus(false)} // input doesn't have focus anymore
-                  className="form-control"
-                />
-                <p
-                  id="uidnote"
-                  className={
-                    userFocus && user && !validName
-                      ? "instructions"
-                      : "offscreen"
-                  }
-                >
-                  <FontAwesomeIcon icon={faInfoCircle} />
-                  4 to 24 characters.
-                  <br />
-                  Must begin with a letter.
-                  <br />
-                  Letters, numbers, underscores, hyphens allowed.
-                </p>
-              </div>
-
-              {/* email */}
-              <div className="mb-3">
-                <label htmlFor="email" className="form-label">
-                  Email:
-                  <FontAwesomeIcon
-                    icon={faCheck}
-                    className={`custom-check-icon ${
-                      validEmail ? "valid" : "hide"
-                    }`}
-                  />
-                  <FontAwesomeIcon
-                    icon={faTimes}
-                    className={`custom-times-icon ${
-                      validEmail || !email ? "hide" : "invalid"
-                    }`}
-                  />
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  autoComplete="off"
-                  onChange={(e) => setEmail(e.target.value)}
-                  value={email}
-                  required
-                  aria-invalid={validEmail ? "false" : "true"}
-                  aria-describedby="eidnote"
-                  onFocus={() => setEmailFocus(true)} // input has focus
-                  onBlur={() => setEmailFocus(false)} // input doesn't have focus anymore
-                  className="form-control"
-                />
-                <p
-                  id="eidnote"
-                  className={
-                    emailFocus && email && !validEmail
-                      ? "instructions"
-                      : "offscreen"
-                  }
-                >
-                  <FontAwesomeIcon icon={faInfoCircle} />
-                  Must have an @ symbol followed by a domain name.
-                  <br />
-                  No spaces allowed.
-                  <br />
-                  Letters, numbers, underscores, hyphens allowed.
-                </p>
-              </div>
-
-              {/* password */}
-              <div className="mb-3">
-                <label htmlFor="password" className="form-label">
-                  Password:
-                  <FontAwesomeIcon
-                    icon={faCheck}
-                    className={`custom-check-icon ${
-                      validPwd ? "valid" : "hide"
-                    }`}
-                  />
-                  <FontAwesomeIcon
-                    icon={faTimes}
-                    className={`custom-times-icon ${
-                      validPwd || !pwd ? "hide" : "invalid"
-                    }`}
-                  />
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  onChange={(e) => setPwd(e.target.value)}
-                  required
-                  aria-invalid={validPwd ? "false" : "true"}
-                  aria-describedby="pwdnote"
-                  onFocus={() => setPwdFocus(true)}
-                  onBlur={() => setPwdFocus(false)}
-                  className="form-control"
-                />
-                <p
-                  id="pwdnote"
-                  className={
-                    pwdFocus && !validPwd ? "instructions" : "offscreen"
-                  }
-                >
-                  <FontAwesomeIcon icon={faInfoCircle} />
-                  8 to 24 characters.
-                  <br />
-                  Must include uppercase and lowercase letters, a number and a
-                  special character.
-                  <br />
-                  Allowed special characters:{" "}
-                  <span aria-label="exclamation mark">!</span>{" "}
-                  <span aria-label="at symbol">@</span>{" "}
-                  <span aria-label="hashtag">#</span>{" "}
-                  <span aria-label="dollar sign">$</span>{" "}
-                  <span aria-label="percent">%</span>
-                </p>
-              </div>
-
-              {/* match password */}
-              <div className="mb-3">
-                <label htmlFor="confirm_pwd" className="form-label">
-                  Confirm Password:
-                  <FontAwesomeIcon
-                    icon={faCheck}
-                    className={`custom-check-icon ${
-                      validMatch && matchPwd ? "valid" : "hide"
-                    }`}
-                  />
-                  <FontAwesomeIcon
-                    icon={faTimes}
-                    className={`custom-times-icon ${
-                      validMatch || !matchPwd ? "hide" : "invalid"
-                    }`}
-                  />
-                </label>
-                <input
-                  type="password"
-                  id="confirm_pwd"
-                  onChange={(e) => setMatchPwd(e.target.value)}
-                  value={matchPwd}
-                  required
-                  aria-invalid={validMatch ? "false" : "true"}
-                  aria-describedby="confirmnote"
-                  onFocus={() => setMatchFocus(true)}
-                  onBlur={() => setMatchFocus(false)}
-                  className="form-control"
-                />
-                <p
-                  id="confirmnote"
-                  className={
-                    matchFocus && !validMatch ? "instructions" : "offscreen"
-                  }
-                >
-                  <FontAwesomeIcon icon={faInfoCircle} />
-                  Must match the first password input field.
-                </p>
-              </div>
-
-              {/* Mental health professional or not */}
-              <div className="mb-3">
-                <label htmlFor="user-type" className="form-label">
-                  Type of User:
-                </label>
-                <div className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    name="userType"
-                    id="nmhp"
-                    value="nmhp"
-                    checked={selectedUserType === "nmhp"}
-                    onChange={handleUserTypeChange}
-                  />
-                  <label className="form-check-label" htmlFor="nmhp_label">
-                    I am not a mental health professional.
-                  </label>
-                </div>
-                <div className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    name="userType"
-                    id="mhp"
-                    value="mhp"
-                    checked={selectedUserType === "mhp"}
-                    onChange={handleUserTypeChange}
-                  />
-                  <label className="form-check-label" htmlFor="mhp_label">
-                    I am a mental health professional.
-                  </label>
-                </div>
-              </div>
-
-              {/* age, gender, pronouns */}
-              <div className="row">
-                <div className="mb-3 col">
-                  <label className="form-label">Age</label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    id="age"
-                    required
-                  />
-                </div>
-
-                <div className="mb-3 col">
-                  <label className="form-label">Gender</label>
-                  <select className="form-select" id="gender" defaultValue="">
-                    <option value="" disabled>
-                      Select your gender
-                    </option>
-                    <option value="Woman">Woman</option>
-                    <option value="Non-Binary">Non-Binary</option>
-                    <option value="Man">Man</option>
-                    <option value="Others">Others</option>
-                    <option value="PNTS">Prefer Not to Say</option>
-                  </select>
-                </div>
-
-                <div className="mb-3 col">
-                  <label className="form-label">Pronouns</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="pronouns"
-                    placeholder="e.g. she/her, he/him, they/them, etc."
-                  />
-                </div>
-              </div>
-
-              {/* Upload Picture */}
-              <div className="mb-3">
-                <label htmlFor="display-pic" className="form-label">
-                  Upload display picture:
-                </label>
-                <input
-                  type="file"
-                  className="form-control"
-                  id="display-pic"
-                  required
-                  ref={fileInputRef}
-                />
-              </div>
-
-              {/* Button */}
-              <Button
-                color="primary"
-                onClick={handleSubmit}
-                disabled={!validName || !validPwd || !validMatch}
-              >
-                Sign Up
-              </Button>
-            </form>
-            {/* END OF FORM */}
-            <p>
-              <label className="form-label">Already registered?</label>
+              <FontAwesomeIcon icon={faInfoCircle} />
+              4 to 24 characters.
               <br />
-              <span className="line">
-                {/*put router link here*/}
-                <Link to="/SignIn">Sign In</Link>
-              </span>
+              Must begin with a letter.
+              <br />
+              Letters, numbers, underscores, hyphens allowed.
             </p>
-          </section>
-     
+          </div>
+
+          {/* email */}
+          <div className="mb-3">
+            <label htmlFor="email" className="form-label">
+              Email:
+              <FontAwesomeIcon
+                icon={faCheck}
+                className={`custom-check-icon ${validEmail ? "valid" : "hide"}`}
+              />
+              <FontAwesomeIcon
+                icon={faTimes}
+                className={`custom-times-icon ${
+                  validEmail || !email ? "hide" : "invalid"
+                }`}
+              />
+            </label>
+            <input
+              type="email"
+              id="email"
+              autoComplete="off"
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              required
+              aria-invalid={validEmail ? "false" : "true"}
+              aria-describedby="eidnote"
+              onFocus={() => setEmailFocus(true)} // input has focus
+              onBlur={() => setEmailFocus(false)} // input doesn't have focus anymore
+              className="form-control"
+            />
+            <p
+              id="eidnote"
+              className={
+                emailFocus && email && !validEmail
+                  ? "instructions"
+                  : "offscreen"
+              }
+            >
+              <FontAwesomeIcon icon={faInfoCircle} />
+              Must have an @ symbol followed by a domain name.
+              <br />
+              No spaces allowed.
+              <br />
+              Letters, numbers, underscores, hyphens allowed.
+            </p>
+          </div>
+
+          {/* password */}
+          <div className="mb-3">
+            <label htmlFor="password" className="form-label">
+              Password:
+              <FontAwesomeIcon
+                icon={faCheck}
+                className={`custom-check-icon ${validPwd ? "valid" : "hide"}`}
+              />
+              <FontAwesomeIcon
+                icon={faTimes}
+                className={`custom-times-icon ${
+                  validPwd || !pwd ? "hide" : "invalid"
+                }`}
+              />
+            </label>
+            <input
+              type="password"
+              id="password"
+              onChange={(e) => setPwd(e.target.value)}
+              required
+              aria-invalid={validPwd ? "false" : "true"}
+              aria-describedby="pwdnote"
+              onFocus={() => setPwdFocus(true)}
+              onBlur={() => setPwdFocus(false)}
+              className="form-control"
+            />
+            <p
+              id="pwdnote"
+              className={pwdFocus && !validPwd ? "instructions" : "offscreen"}
+            >
+              <FontAwesomeIcon icon={faInfoCircle} />
+              8 to 24 characters.
+              <br />
+              Must include uppercase and lowercase letters, a number and a
+              special character.
+              <br />
+              Allowed special characters:{" "}
+              <span aria-label="exclamation mark">!</span>{" "}
+              <span aria-label="at symbol">@</span>{" "}
+              <span aria-label="hashtag">#</span>{" "}
+              <span aria-label="dollar sign">$</span>{" "}
+              <span aria-label="percent">%</span>
+            </p>
+          </div>
+
+          {/* match password */}
+          <div className="mb-3">
+            <label htmlFor="confirm_pwd" className="form-label">
+              Confirm Password:
+              <FontAwesomeIcon
+                icon={faCheck}
+                className={`custom-check-icon ${
+                  validMatch && matchPwd ? "valid" : "hide"
+                }`}
+              />
+              <FontAwesomeIcon
+                icon={faTimes}
+                className={`custom-times-icon ${
+                  validMatch || !matchPwd ? "hide" : "invalid"
+                }`}
+              />
+            </label>
+            <input
+              type="password"
+              id="confirm_pwd"
+              onChange={(e) => setMatchPwd(e.target.value)}
+              value={matchPwd}
+              required
+              aria-invalid={validMatch ? "false" : "true"}
+              aria-describedby="confirmnote"
+              onFocus={() => setMatchFocus(true)}
+              onBlur={() => setMatchFocus(false)}
+              className="form-control"
+            />
+            <p
+              id="confirmnote"
+              className={
+                matchFocus && !validMatch ? "instructions" : "offscreen"
+              }
+            >
+              <FontAwesomeIcon icon={faInfoCircle} />
+              Must match the first password input field.
+            </p>
+          </div>
+
+          {/* Mental health professional or not */}
+          <div className="mb-3">
+            <label htmlFor="user-type" className="form-label">
+              Type of User:
+            </label>
+            <div className="form-check">
+              <input
+                className="form-check-input"
+                type="radio"
+                name="userType"
+                id="nmhp"
+                value="nmhp"
+                checked={selectedUserType === "nmhp"}
+                onChange={handleUserTypeChange}
+              />
+              <label className="form-check-label" htmlFor="nmhp_label">
+                I am not a mental health professional.
+              </label>
+            </div>
+            <div className="form-check">
+              <input
+                className="form-check-input"
+                type="radio"
+                name="userType"
+                id="mhp"
+                value="mhp"
+                checked={selectedUserType === "mhp"}
+                onChange={handleUserTypeChange}
+              />
+              <label className="form-check-label" htmlFor="mhp_label">
+                I am a mental health professional.
+              </label>
+            </div>
+          </div>
+
+          {/* age, gender, pronouns */}
+          <div className="row">
+            <div className="mb-3 col">
+              <label className="form-label">Age</label>
+              <input type="number" className="form-control" id="age" required />
+            </div>
+
+            <div className="mb-3 col">
+              <label className="form-label">Gender</label>
+              <select className="form-select" id="gender" defaultValue="n/a">
+                <option value="n/a" disabled>
+                  Select your gender
+                </option>
+                <option value="Woman">Woman</option>
+                <option value="Non-Binary">Non-Binary</option>
+                <option value="Man">Man</option>
+                <option value="Others">Others</option>
+                <option value="PNTS">Prefer Not to Say</option>
+              </select>
+            </div>
+
+            <div className="mb-3 col">
+              <label className="form-label">Pronouns</label>
+              <input
+                type="text"
+                className="form-control"
+                id="pronouns"
+                placeholder="e.g. she/her, he/him, they/them, etc."
+              />
+            </div>
+          </div>
+
+          {/* Upload Picture */}
+          <div className="mb-3">
+            <label htmlFor="display-pic" className="form-label">
+              Upload display picture:
+            </label>
+            <input
+              type="file"
+              className="form-control"
+              id="display-pic"
+              required
+              ref={fileInputRef}
+            />
+          </div>
+
+          {/* Button */}
+          <Button
+            color="primary"
+            onClick={handleSubmit}
+            disabled={!validName || !validPwd || !validMatch}
+          >
+            Sign Up
+          </Button>
+        </form>
+        {/* END OF FORM */}
+        <p>
+          <label className="form-label mt-2 me-2">Already registered?</label>
+
+          <span className="line">
+            {/*put router link here*/}
+            <Link to="/SignIn">Sign In</Link>
+          </span>
+        </p>
       </section>
     </>
   );

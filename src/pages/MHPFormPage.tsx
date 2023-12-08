@@ -21,7 +21,10 @@ const MHPFormPage = () => {
     licenseNumberRef.current?.focus();
   }, []);
 
-  // mental health professional verification
+  // CHECKBOXES
+  // Array to store the values of checked checkboxes
+  const [disordersSpecializationArr, setDisordersSpecializationArr] = useState<string[]>([]);
+
   const disordersSpecializationCheckboxes = document.getElementById(
     "disordersSpecializationCheckboxes"
   );
@@ -33,16 +36,26 @@ const MHPFormPage = () => {
 
     checkboxes.forEach((checkbox) => {
       checkbox.addEventListener("change", () => {
+        // set validDisordersSpecialization to true if at least one of the checkboxes is checked
         setValidDisordersSpecialization(
           Array.from(checkboxes).some((cb) => (cb as HTMLInputElement).checked)
         );
+
+        // get the value of the checked checkbox
+        const inputCheckbox = checkbox as HTMLInputElement;
+
+        // Check if the checkbox is checked
+        if (inputCheckbox.checked) {
+          setDisordersSpecializationArr((prevValues) => [...prevValues, inputCheckbox.value])
+        } else {
+          setDisordersSpecializationArr((prevValues) => prevValues.filter((val) => val !== inputCheckbox.value)
+          );
+        }
+
+        console.log("Checked Values:", disordersSpecializationArr);
       });
     });
-  } else {
-    console.error(
-      "Element with id 'disordersSpecializationCheckboxes' not found."
-    );
-  }
+  } 
 
   const feesCheckboxes = document.getElementById("feesCheckboxes");
 
@@ -57,8 +70,6 @@ const MHPFormPage = () => {
         );
       });
     });
-  } else {
-    console.error("Element with id 'feesCheckboxes' not found.");
   }
 
   const availableDaysCheckboxes = document.getElementById(
@@ -77,8 +88,6 @@ const MHPFormPage = () => {
         );
       });
     });
-  } else {
-    console.error("Element with id 'availableDaysCheckboxes' not found.");
   }
 
   const availableHoursCheckboxes = document.getElementById(
@@ -97,12 +106,36 @@ const MHPFormPage = () => {
         );
       });
     });
-  } else {
-    console.error("Element with id 'availableHoursCheckboxes' not found.");
   }
+
+  const handleVerify = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    console.log("FINAL CHECKBOXES: " + disordersSpecializationArr);
+
+    // Make a request here to /api/users to get the record with the inputted user (if it exists)
+    // try {
+    //   const response = await fetch(
+    //     `http://localhost:3001/api/license_number_check/${user}`
+    //   );
+
+    //   if (response.ok) {
+    //     console.log("This is a unique license number.");
+    //   } else {
+    //     console.error("This license number already exists.");
+
+    //     return;
+    //   }
+    // } catch (error) {
+    //   console.error("Error during GET request:", error);
+
+    //   return;
+    // }
+  };
+
   return (
     <>
-      <section className="container-sm mt-5">
+      <section className="container-sm my-5">
         <form>
           {/* license number */}
           <div className="mb-3">
@@ -928,9 +961,7 @@ const MHPFormPage = () => {
 
           <Button
             color="primary"
-            onClick={() => {
-              console.log("submitted!!!");
-            }}
+            onClick={handleVerify}
             disabled={
               !validLicenseNumber ||
               !validDisordersSpecialization ||

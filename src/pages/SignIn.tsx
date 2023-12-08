@@ -78,7 +78,7 @@ const SignIn = () => {
           } else if (State === "Blocked") {
             setErrMsg("Your account is blocked.");
           } else if (State === "Unverified") {
-            setErrMsg("Your account is currently unverified.");
+            navigate("/MHPFormPage")
           }
         }
       } else {
