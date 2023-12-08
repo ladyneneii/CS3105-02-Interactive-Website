@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, ChangeEvent } from "react";
 import Button from "../components/Button";
 
 const MHPFormPage = () => {
@@ -21,97 +21,159 @@ const MHPFormPage = () => {
     licenseNumberRef.current?.focus();
   }, []);
 
+  const [licenseNumber, setLicenseNumber] = useState("");
+
+  const handleLicenseNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newLicenseNumber = e.target.value;
+    setLicenseNumber(newLicenseNumber);
+    setValidLicenseNumber(newLicenseNumber.length === 0 ? false : true);
+  };
+
+  const [yearsOfExperience, setYearsOfExperience] = useState("");
+
+  const handleYearsOfExperience = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newYearsOfExperience = e.target.value;
+    setYearsOfExperience(newYearsOfExperience);
+    setValidYearsOfExperience(newYearsOfExperience.length === 0 ? false : true);
+  };
+
+  const [minimumAge, setMinimumAge] = useState("");
+
+  const handleMinimumAge = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newMinimumAge = e.target.value;
+    setMinimumAge(newMinimumAge);
+    setValidMinimumAge(newMinimumAge.length === 0 ? false : true);
+  };
+
+  const [maximumAge, setMaximumAge] = useState("");
+
+  const handleMaximumAge = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newMaximumAge = e.target.value;
+    setMaximumAge(newMaximumAge);
+    setValidMaximumAge(newMaximumAge.length === 0 ? false : true);
+  };
+
+  const [languages, setLanguages] = useState("");
+
+  const handleLanguages = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newLanguages = e.target.value;
+    setLanguages(newLanguages);
+    setValidLanguages(newLanguages.length === 0 ? false : true);
+  };
+
+  const [contactNumber, setContactNumber] = useState("");
+
+  const handleContactNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newContactNumber = e.target.value;
+    setContactNumber(newContactNumber);
+    setValidContactNumber(newContactNumber.length === 0 ? false : true);
+  };
+
+  const [notes, setNotes] = useState("");
+
+  const handleNotes = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newNotes = e.target.value;
+    setNotes(newNotes);
+  };
+
   // CHECKBOXES
   // Array to store the values of checked checkboxes
-  const [disordersSpecializationArr, setDisordersSpecializationArr] = useState<string[]>([]);
+  const [disordersSpecializationArr, setDisordersSpecializationArr] = useState<
+    string[]
+  >([]);
 
-  const disordersSpecializationCheckboxes = document.getElementById(
-    "disordersSpecializationCheckboxes"
-  );
+  const handleDisordersSpecializationCheckboxesChange = (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    const inputCheckbox = event.target as HTMLInputElement;
+    const value = inputCheckbox.value;
 
-  if (disordersSpecializationCheckboxes) {
-    // Select all checkboxes within the disordersSpecializationCheckboxes
-    const checkboxes =
-      disordersSpecializationCheckboxes.querySelectorAll(".form-check-input");
+    setDisordersSpecializationArr((prevValues) => {
+      const updatedValues = inputCheckbox.checked
+        ? [...prevValues, value]
+        : prevValues.filter((val) => val !== value);
 
-    checkboxes.forEach((checkbox) => {
-      checkbox.addEventListener("change", () => {
-        // set validDisordersSpecialization to true if at least one of the checkboxes is checked
-        setValidDisordersSpecialization(
-          Array.from(checkboxes).some((cb) => (cb as HTMLInputElement).checked)
-        );
+      console.log(updatedValues); // Log the updated array
+      setValidDisordersSpecialization(updatedValues.length > 0 ? true : false);
 
-        // get the value of the checked checkbox
-        const inputCheckbox = checkbox as HTMLInputElement;
-
-        // Check if the checkbox is checked
-        if (inputCheckbox.checked) {
-          setDisordersSpecializationArr((prevValues) => [...prevValues, inputCheckbox.value])
-        } else {
-          setDisordersSpecializationArr((prevValues) => prevValues.filter((val) => val !== inputCheckbox.value)
-          );
-        }
-
-        console.log("Checked Values:", disordersSpecializationArr);
-      });
+      return updatedValues;
     });
-  } 
+  };
 
-  const feesCheckboxes = document.getElementById("feesCheckboxes");
+  const [feesArr, setFeesArr] = useState<string[]>([]);
 
-  if (feesCheckboxes) {
-    // Select all checkboxes within the feesCheckboxes
-    const checkboxes = feesCheckboxes.querySelectorAll(".form-check-input");
+  const handleFeesCheckboxesChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const inputCheckbox = event.target as HTMLInputElement;
+    const value = inputCheckbox.value;
 
-    checkboxes.forEach((checkbox) => {
-      checkbox.addEventListener("change", () => {
-        setValidFees(
-          Array.from(checkboxes).some((cb) => (cb as HTMLInputElement).checked)
-        );
-      });
+    setFeesArr((prevValues) => {
+      const updatedValues = inputCheckbox.checked
+        ? [...prevValues, value]
+        : prevValues.filter((val) => val !== value);
+
+      console.log(updatedValues); // Log the updated array
+      setValidFees(updatedValues.length > 0 ? true : false);
+
+      return updatedValues;
     });
-  }
+  };
 
-  const availableDaysCheckboxes = document.getElementById(
-    "availableDaysCheckboxes"
-  );
+  const [availableDaysArr, setAvailableDaysArr] = useState<string[]>([]);
 
-  if (availableDaysCheckboxes) {
-    // Select all checkboxes within the availableDaysCheckboxes
-    const checkboxes =
-      availableDaysCheckboxes.querySelectorAll(".form-check-input");
+  const handleAvailableDaysCheckboxesChange = (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    const inputCheckbox = event.target as HTMLInputElement;
+    const value = inputCheckbox.value;
 
-    checkboxes.forEach((checkbox) => {
-      checkbox.addEventListener("change", () => {
-        setValidAvailableDays(
-          Array.from(checkboxes).some((cb) => (cb as HTMLInputElement).checked)
-        );
-      });
+    setAvailableDaysArr((prevValues) => {
+      const updatedValues = inputCheckbox.checked
+        ? [...prevValues, value]
+        : prevValues.filter((val) => val !== value);
+
+      console.log(updatedValues); // Log the updated array
+      setValidAvailableDays(updatedValues.length > 0 ? true : false);
+
+      return updatedValues;
     });
-  }
+  };
 
-  const availableHoursCheckboxes = document.getElementById(
-    "availableHoursCheckboxes"
-  );
+  const [availableHoursArr, setAvailableHoursArr] = useState<string[]>([]);
 
-  if (availableHoursCheckboxes) {
-    // Select all checkboxes within the availableHoursCheckboxes
-    const checkboxes =
-      availableHoursCheckboxes.querySelectorAll(".form-check-input");
+  const handleAvailableHoursCheckboxesChange = (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    const inputCheckbox = event.target as HTMLInputElement;
+    const value = inputCheckbox.value;
 
-    checkboxes.forEach((checkbox) => {
-      checkbox.addEventListener("change", () => {
-        setValidAvailableHours(
-          Array.from(checkboxes).some((cb) => (cb as HTMLInputElement).checked)
-        );
-      });
+    setAvailableHoursArr((prevValues) => {
+      const updatedValues = inputCheckbox.checked
+        ? [...prevValues, value]
+        : prevValues.filter((val) => val !== value);
+
+      console.log(updatedValues); // Log the updated array
+      setValidAvailableHours(updatedValues.length > 0 ? true : false);
+
+      return updatedValues;
     });
-  }
+  };
 
   const handleVerify = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    console.log("FINAL CHECKBOXES: " + disordersSpecializationArr);
+    console.log(licenseNumber);
+    console.log(disordersSpecializationArr);
+    console.log(feesArr);
+    console.log(yearsOfExperience);
+    console.log(minimumAge);
+    console.log(maximumAge);
+    console.log(languages);
+    console.log(availableDaysArr);
+    console.log(availableHoursArr);
+    console.log(contactNumber);
+    console.log(notes);
+
+    // console.log("FINAL CHECKBOXES: " + disordersSpecializationArr);
 
     // Make a request here to /api/users to get the record with the inputted user (if it exists)
     // try {
@@ -146,11 +208,7 @@ const MHPFormPage = () => {
               type="text"
               id="licenseNumber"
               ref={licenseNumberRef}
-              onChange={(e) => {
-                e.target.value === ""
-                  ? setValidLicenseNumber(false)
-                  : setValidLicenseNumber(true);
-              }}
+              onChange={handleLicenseNumber}
               required
               className="form-control"
             />
@@ -168,6 +226,7 @@ const MHPFormPage = () => {
                 type="checkbox"
                 value="anxiety-disorders"
                 id="anxiety-disorders"
+                onChange={handleDisordersSpecializationCheckboxesChange}
               />
               <label className="form-check-label" htmlFor="anxiety-disorders">
                 Anxiety Disorders
@@ -180,6 +239,7 @@ const MHPFormPage = () => {
                 type="checkbox"
                 value="eating-disorders"
                 id="eating-disorders"
+                onChange={handleDisordersSpecializationCheckboxesChange}
               />
               <label className="form-check-label" htmlFor="eating-disorders">
                 Eating Disorders
@@ -192,6 +252,7 @@ const MHPFormPage = () => {
                 type="checkbox"
                 value="bipolar-affective-disorder"
                 id="bipolar-affective-disorder"
+                onChange={handleDisordersSpecializationCheckboxesChange}
               />
               <label
                 className="form-check-label"
@@ -207,6 +268,7 @@ const MHPFormPage = () => {
                 type="checkbox"
                 value="depression"
                 id="depression"
+                onChange={handleDisordersSpecializationCheckboxesChange}
               />
               <label className="form-check-label" htmlFor="depression">
                 Depression
@@ -219,6 +281,7 @@ const MHPFormPage = () => {
                 type="checkbox"
                 value="dissociation-and-dissociative-disorders"
                 id="dissociation-and-dissociative-disorders"
+                onChange={handleDisordersSpecializationCheckboxesChange}
               />
               <label
                 className="form-check-label"
@@ -234,6 +297,7 @@ const MHPFormPage = () => {
                 type="checkbox"
                 value="eating-disorders"
                 id="eating-disorders"
+                onChange={handleDisordersSpecializationCheckboxesChange}
               />
               <label className="form-check-label" htmlFor="eating-disorders">
                 Eating Disorders
@@ -246,6 +310,7 @@ const MHPFormPage = () => {
                 type="checkbox"
                 value="obsessive-compulsive-disorder"
                 id="obsessive-compulsive-disorder"
+                onChange={handleDisordersSpecializationCheckboxesChange}
               />
               <label
                 className="form-check-label"
@@ -261,6 +326,7 @@ const MHPFormPage = () => {
                 type="checkbox"
                 value="paranoia"
                 id="paranoia"
+                onChange={handleDisordersSpecializationCheckboxesChange}
               />
               <label className="form-check-label" htmlFor="paranoia">
                 Paranoia
@@ -273,6 +339,7 @@ const MHPFormPage = () => {
                 type="checkbox"
                 value="post-traumatic-stress-disorder"
                 id="post-traumatic-stress-disorder"
+                onChange={handleDisordersSpecializationCheckboxesChange}
               />
               <label
                 className="form-check-label"
@@ -288,6 +355,7 @@ const MHPFormPage = () => {
                 type="checkbox"
                 value="psychosis"
                 id="psychosis"
+                onChange={handleDisordersSpecializationCheckboxesChange}
               />
               <label className="form-check-label" htmlFor="psychosis">
                 Psychosis
@@ -300,6 +368,7 @@ const MHPFormPage = () => {
                 type="checkbox"
                 value="schizophrenia"
                 id="schizophrenia"
+                onChange={handleDisordersSpecializationCheckboxesChange}
               />
               <label className="form-check-label" htmlFor="schizophrenia">
                 Schizophrenia
@@ -312,6 +381,7 @@ const MHPFormPage = () => {
                 type="checkbox"
                 value="neurodevelopmental-disorders"
                 id="neurodevelopmental-disorders"
+                onChange={handleDisordersSpecializationCheckboxesChange}
               />
               <label
                 className="form-check-label"
@@ -335,6 +405,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="0-500"
                   id="fees-0-500"
+                  onChange={handleFeesCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="fees-0-500">
                   ₱0-₱500
@@ -347,6 +418,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="500-1000"
                   id="fees-500-1000"
+                  onChange={handleFeesCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="fees-500-1000">
                   ₱500-₱1000
@@ -359,6 +431,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="1000-1500"
                   id="fees-1000-1500"
+                  onChange={handleFeesCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="fees-1000-1500">
                   ₱1000-₱1500
@@ -371,6 +444,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="1500-2000"
                   id="fees-1500-2000"
+                  onChange={handleFeesCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="fees-1500-2000">
                   ₱1500-₱2000
@@ -383,6 +457,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="2000-2500"
                   id="fees-2000-2500"
+                  onChange={handleFeesCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="fees-2000-2500">
                   ₱2000-₱2500
@@ -395,6 +470,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="2500-3000"
                   id="fees-2500-3000"
+                  onChange={handleFeesCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="fees-2500-3000">
                   ₱2500-₱3000
@@ -409,6 +485,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="3000-3500"
                   id="fees-3000-3500"
+                  onChange={handleFeesCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="fees-3000-3500">
                   ₱3000-₱3500
@@ -421,6 +498,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="3500-4000"
                   id="fees-3500-4000"
+                  onChange={handleFeesCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="fees-3500-4000">
                   ₱3500-₱4000
@@ -433,6 +511,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="4000-4500"
                   id="fees-4000-4500"
+                  onChange={handleFeesCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="fees-4000-4500">
                   ₱4000-₱4500
@@ -445,6 +524,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="4500-5000"
                   id="fees-4500-5000"
+                  onChange={handleFeesCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="fees-4500-5000">
                   ₱4500-₱5000
@@ -457,6 +537,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="5000-above"
                   id="fees-5000-above"
+                  onChange={handleFeesCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="fees-5000-above">
                   ₱5000 and above
@@ -473,11 +554,7 @@ const MHPFormPage = () => {
                 type="number"
                 className="form-control"
                 id="yearsOfExperience"
-                onChange={(e) => {
-                  e.target.value === ""
-                    ? setValidYearsOfExperience(false)
-                    : setValidYearsOfExperience(true);
-                }}
+                onChange={handleYearsOfExperience}
                 required
               />
             </div>
@@ -489,11 +566,7 @@ const MHPFormPage = () => {
                 type="number"
                 className="form-control"
                 id="minimumAge"
-                onChange={(e) => {
-                  e.target.value === ""
-                    ? setValidMinimumAge(false)
-                    : setValidMinimumAge(true);
-                }}
+                onChange={handleMinimumAge}
                 required
               />
             </div>
@@ -505,17 +578,13 @@ const MHPFormPage = () => {
                 type="number"
                 className="form-control"
                 id="maximumAge"
-                onChange={(e) => {
-                  e.target.value === ""
-                    ? setValidMaximumAge(false)
-                    : setValidMaximumAge(true);
-                }}
+                onChange={handleMaximumAge}
                 required
               />
             </div>
           </div>
 
-          {/* languaes spoken */}
+          {/* languages spoken */}
           <div className="mb-3">
             <label className="form-label">
               Languages (separate by a comma and space):
@@ -525,11 +594,7 @@ const MHPFormPage = () => {
               className="form-control"
               id="languages"
               placeholder="English, Filipino, Bisaya"
-              onChange={(e) => {
-                e.target.value === ""
-                  ? setValidLanguages(false)
-                  : setValidLanguages(true);
-              }}
+              onChange={handleLanguages}
               required
             />
           </div>
@@ -547,6 +612,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="sunday"
                   id="sunday"
+                  onChange={handleAvailableDaysCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="sunday">
                   Sunday
@@ -559,6 +625,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="monday"
                   id="monday"
+                  onChange={handleAvailableDaysCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="monday">
                   Monday
@@ -571,6 +638,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="tuesday"
                   id="tuesday"
+                  onChange={handleAvailableDaysCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="tuesday">
                   Tuesday
@@ -583,6 +651,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="wednesday"
                   id="wednesday"
+                  onChange={handleAvailableDaysCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="wednesday">
                   Wednesday
@@ -597,6 +666,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="thursday"
                   id="thursday"
+                  onChange={handleAvailableDaysCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="thursday">
                   Thursday
@@ -609,6 +679,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="friday"
                   id="friday"
+                  onChange={handleAvailableDaysCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="friday">
                   Friday
@@ -621,6 +692,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="saturday"
                   id="saturday"
+                  onChange={handleAvailableDaysCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="saturday">
                   Saturday
@@ -642,6 +714,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="12:00AM"
                   id="hours-12:00AM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="12:00AM">
                   12:00 AM
@@ -654,6 +727,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="1:00AM"
                   id="hours-1:00AM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="1:00AM">
                   1:00 AM
@@ -666,6 +740,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="2:00AM"
                   id="hours-2:00AM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="2:00AM">
                   2:00 AM
@@ -678,6 +753,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="3:00AM"
                   id="hours-3:00AM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="3:00AM">
                   3:00 AM
@@ -690,6 +766,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="4:00AM"
                   id="hours-4:00AM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="4:00AM">
                   4:00 AM
@@ -702,6 +779,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="5:00AM"
                   id="hours-5:00AM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="5:00AM">
                   5:00 AM
@@ -714,6 +792,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="6:00AM"
                   id="hours-6:00AM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="6:00AM">
                   6:00 AM
@@ -726,6 +805,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="7:00AM"
                   id="hours-7:00AM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="7:00AM">
                   7:00 AM
@@ -738,6 +818,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="8:00AM"
                   id="hours-8:00AM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="8:00AM">
                   8:00 AM
@@ -750,6 +831,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="9:00AM"
                   id="hours-9:00AM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="9:00AM">
                   9:00 AM
@@ -762,6 +844,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="10:00AM"
                   id="hours-10:00AM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="10:00AM">
                   10:00 AM
@@ -774,6 +857,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="11:00AM"
                   id="hours-11:00AM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="11:00AM">
                   11:00 AM
@@ -788,6 +872,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="12:00PM"
                   id="hours-12:00PM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="12:00PM">
                   12:00 PM
@@ -800,6 +885,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="1:00PM"
                   id="hours-1:00PM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="1:00PM">
                   1:00 PM
@@ -812,6 +898,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="2:00PM"
                   id="hours-2:00PM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="2:00PM">
                   2:00 PM
@@ -824,6 +911,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="3:00PM"
                   id="hours-3:00PM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="3:00PM">
                   3:00 PM
@@ -836,6 +924,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="4:00PM"
                   id="hours-4:00PM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="4:00PM">
                   4:00 PM
@@ -848,6 +937,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="5:00PM"
                   id="hours-5:00PM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="5:00PM">
                   5:00 PM
@@ -860,6 +950,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="6:00PM"
                   id="hours-6:00PM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="6:00PM">
                   6:00 PM
@@ -872,6 +963,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="7:00PM"
                   id="hours-7:00PM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="7:00PM">
                   7:00 PM
@@ -884,6 +976,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="8:00PM"
                   id="hours-8:00PM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="8:00PM">
                   8:00 PM
@@ -896,6 +989,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="9:00PM"
                   id="hours-9:00PM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="9:00PM">
                   9:00 PM
@@ -908,6 +1002,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="10:00PM"
                   id="hours-10:00PM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="10:00PM">
                   10:00 PM
@@ -920,6 +1015,7 @@ const MHPFormPage = () => {
                   type="checkbox"
                   value="11:00PM"
                   id="hours-11:00PM"
+                  onChange={handleAvailableHoursCheckboxesChange}
                 />
                 <label className="form-check-label" htmlFor="11:00PM">
                   11:00 PM
@@ -939,11 +1035,7 @@ const MHPFormPage = () => {
               required
               className="form-control"
               placeholder="Add as many as you can. Any format will do."
-              onChange={(e) => {
-                e.target.value === ""
-                  ? setValidContactNumber(false)
-                  : setValidContactNumber(true);
-              }}
+              onChange={handleContactNumber}
             />
           </div>
 
@@ -953,6 +1045,7 @@ const MHPFormPage = () => {
               className="form-control"
               placeholder="Leave additional information here"
               id="floatingTextarea"
+              onChange={handleNotes}
             ></textarea>
             <label htmlFor="floatingTextarea">
               Leave additional information here:
