@@ -1,7 +1,9 @@
 import { useRef, useState, useEffect, ChangeEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 
 const MHPFormPage = () => {
+  const navigate = useNavigate();
   // mental health professional verification
   const licenseNumberRef = useRef<HTMLInputElement | null>(null);
 
@@ -170,6 +172,8 @@ const MHPFormPage = () => {
       return;
     }
 
+    // TODO: Check if licenseNumber already exists
+
     const disordersSpecialization: string =
       disordersSpecializationArr.join(", ");
     const fees: string = feesArr.join(", ");
@@ -206,9 +210,19 @@ const MHPFormPage = () => {
         });
 
         if (response.ok) {
-          const mhp_details = await response.json();
+          // Update user State from Unverified to Active
+          const user_details_str = localStorage.getItem("user_details");
 
-          console.log("Successfully added mhp.");
+          if (user_details_str) {
+            const user_details = JSON.parse(user_details_str);
+            user_details.State = "Active";
+            localStorage.setItem("user_details", JSON.stringify(user_details));
+
+            console.log("State updated successfully in local storage");
+            navigate("/MainPage");
+          } else {
+            console.log("user_details not found in local storage.");
+          }
         } else {
           console.error("Failed to add user to the database");
 

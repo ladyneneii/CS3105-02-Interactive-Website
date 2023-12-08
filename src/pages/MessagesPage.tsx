@@ -38,7 +38,6 @@ const MessagesPage = () => {
 
   const joinRoom = async () => {
     if (username !== null && room !== "" && pwd !== "") {
-      console.log("helloooo");
       // add data to database
       try {
         const formData = new FormData();

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Card from "../components/Card";
 import Navbar from "../components/Navbar";
 import "leaflet/dist/leaflet.css"; // Import Leaflet CSS
@@ -113,9 +113,15 @@ const MainPage = () => {
           }
         };
 
+        const locationError = (err: GeolocationPositionError) => {
+          console.error(`Geolocation error (${err.code}): ${err.message}`);
+        };
+
         // Ask for location
         if ("geolocation" in navigator) {
-          navigator.geolocation.getCurrentPosition(getPosition);
+          navigator.geolocation.watchPosition(getPosition, locationError, {
+            enableHighAccuracy: true,
+          });
         } else {
           console.log("geolocation not available");
         }
