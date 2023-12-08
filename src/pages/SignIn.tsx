@@ -77,6 +77,8 @@ const SignIn = () => {
             );
           } else if (State === "Blocked") {
             setErrMsg("Your account is blocked.");
+          } else if (State === "Unverified") {
+            setErrMsg("Your account is currently unverified.");
           }
         }
       } else {
@@ -105,6 +107,7 @@ const SignIn = () => {
             {errMsg}
           </p>
           <h1>Sign In</h1>
+          <h3>Welcome to Padayon!</h3>
           {/* START OF FORM */}
           <form>
             {/* email */}

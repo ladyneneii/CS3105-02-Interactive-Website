@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Register from "./pages/Register";
 import SignIn from "./pages/SignIn";
+import MHPFormPage from "./pages/MHPFormPage";
 import MainPage from "./pages/MainPage";
 import CommentsPage from "./pages/CommentsPage";
 import MessagesPage from "./pages/MessagesPage";
@@ -15,6 +16,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Register />} />
           <Route path="/SignIn" element={<SignIn />} />
+          <Route path="/MHPFormPage" element={<MHPFormPage />} />
           <Route path="/MainPage" element={<MainPage />} />
           <Route
             path="/CommentsPage"
