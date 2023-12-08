@@ -52,6 +52,12 @@ const SignIn = () => {
           avatar_url,
           register_date,
           user_id,
+          first_name,
+          middle_name,
+          last_name,
+          Age,
+          Gender,
+          Pronouns,
         } = user_object;
         const user_object_localstorage = {
           Email,
@@ -61,12 +67,21 @@ const SignIn = () => {
           avatar_url,
           register_date,
           user_id,
+          first_name,
+          middle_name,
+          last_name,
+          Age,
+          Gender,
+          Pronouns,
         };
 
         if (State === "Active") {
           console.log("User retrieved successfully!");
 
-          localStorage.setItem("user_details", JSON.stringify(user_object_localstorage));
+          localStorage.setItem(
+            "user_details",
+            JSON.stringify(user_object_localstorage)
+          );
           navigate("/MainPage");
 
           // successful login here
@@ -78,7 +93,11 @@ const SignIn = () => {
           } else if (State === "Blocked") {
             setErrMsg("Your account is blocked.");
           } else if (State === "Unverified") {
-            navigate("/MHPFormPage")
+            localStorage.setItem(
+              "user_details",
+              JSON.stringify(user_object_localstorage)
+            );
+            navigate("/MHPFormPage");
           }
         }
       } else {

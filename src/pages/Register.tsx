@@ -15,6 +15,7 @@ import { auth, storage } from "../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 interface UserProps {
+  user_id: string;
   Username: string;
   Email: string;
   Password: string;
@@ -25,9 +26,9 @@ interface UserProps {
   first_name: string;
   middle_name: string;
   last_name: string;
-  age: string;
-  gender: string;
-  pronouns: string;
+  Age: string;
+  Gender: string;
+  Pronouns: string;
 }
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
@@ -168,26 +169,9 @@ const Register = () => {
     formData.append("first_name", firstName);
     formData.append("middle_name", middleName || "n/a");
     formData.append("last_name", lastName);
-    formData.append("age", age);
-    formData.append("gender", gender || "n/a");
-    formData.append("pronouns", pronouns || "n/a");
-
-    // for localStorage
-    const user_details: UserProps = {
-      Username: user,
-      Email: email,
-      Password: pwd,
-      avatar_url: file,
-      Role: selectedUserType as "admin" | "mhp" | "nmhp",
-      register_date,
-      State: state,
-      first_name: firstName,
-      middle_name: middleName || "n/a",
-      last_name: lastName,
-      age,
-      gender: gender || "n/a",
-      pronouns: pronouns || "n/a",
-    };
+    formData.append("Age", age);
+    formData.append("Gender", gender || "n/a");
+    formData.append("Pronouns", pronouns || "n/a");
 
     // Make a request here to /api/users to get the record with the inputted user (if it exists)
     try {
@@ -240,7 +224,26 @@ const Register = () => {
       });
 
       if (response.ok) {
-        console.log("User added successfully!");
+        const user_id = await response.json();
+        console.log(`Inserted id: ${user_id}`);
+
+        // for localStorage
+        const user_details: UserProps = {
+          user_id,
+          Username: user,
+          Email: email,
+          Password: pwd,
+          avatar_url: file,
+          Role: selectedUserType as "admin" | "mhp" | "nmhp",
+          register_date,
+          State: state,
+          first_name: firstName,
+          middle_name: middleName || "n/a",
+          last_name: lastName,
+          Age: age,
+          Gender: gender || "n/a",
+          Pronouns: pronouns || "n/a",
+        };
 
         // add to localStorage
         localStorage.setItem("user_details", JSON.stringify(user_details));

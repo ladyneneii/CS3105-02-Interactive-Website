@@ -158,22 +158,70 @@ const MHPFormPage = () => {
     });
   };
 
-  const handleVerify = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleVerify = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    console.log(licenseNumber);
-    console.log(disordersSpecializationArr);
-    console.log(feesArr);
-    console.log(yearsOfExperience);
-    console.log(minimumAge);
-    console.log(maximumAge);
-    console.log(languages);
-    console.log(availableDaysArr);
-    console.log(availableHoursArr);
-    console.log(contactNumber);
-    console.log(notes);
+    if (parseInt(minimumAge, 10) < 0 || parseInt(maximumAge, 10) < 0) {
+      alert("Please enter a valid age.");
+      return;
+    }
+    if (parseInt(minimumAge, 10) > parseInt(maximumAge, 10)) {
+      alert("Maximum age must be bigger than or equal to minimum age.");
+      return;
+    }
 
-    // console.log("FINAL CHECKBOXES: " + disordersSpecializationArr);
+    const disordersSpecialization: string =
+      disordersSpecializationArr.join(", ");
+    const fees: string = feesArr.join(", ");
+    const availableDays: string = availableDaysArr.join(", ");
+    const availableHours: string = availableHoursArr.join(", ");
+
+    // Retrieve the user_details string from localStorage
+    const user_details_str = localStorage.getItem("user_details");
+
+    if (user_details_str) {
+      const user_details = JSON.parse(user_details_str);
+      const user_id = user_details.user_id;
+      const formData = new FormData();
+
+      formData.append("license_number", licenseNumber);
+      formData.append("user_id", user_id);
+      formData.append("disorders_specializations", disordersSpecialization);
+      formData.append("Fees", fees);
+      formData.append("years_of_experience", yearsOfExperience);
+      formData.append("Languages", languages);
+      formData.append("min_age", minimumAge);
+      formData.append("max_age", maximumAge);
+      formData.append("contact_number", contactNumber);
+      formData.append("Notes", notes);
+      formData.append("State", "open");
+      formData.append("available_days", availableDays);
+      formData.append("available_hours", availableHours);
+
+      // add data to database
+      try {
+        const response = await fetch("http://localhost:3001/api/mhps", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (response.ok) {
+          const mhp_details = await response.json();
+
+          console.log("Successfully added mhp.");
+        } else {
+          console.error("Failed to add user to the database");
+
+          return;
+        }
+      } catch (error) {
+        console.error("Error during POST request:", error);
+
+        return;
+      }
+    } else {
+      console.log("user_id not found in localstorage.");
+    }
 
     // Make a request here to /api/users to get the record with the inputted user (if it exists)
     // try {
