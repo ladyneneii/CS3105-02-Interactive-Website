@@ -3,7 +3,7 @@ import Register from "./pages/Register";
 import SignIn from "./pages/SignIn";
 import MHPFormPage from "./pages/MHPFormPage";
 import MainPage from "./pages/MainPage";
-import CommentsPage from "./pages/CommentsPage";
+import PostsPage from "./pages/PostsPage";
 import MessagesPage from "./pages/MessagesPage";
 import io from "socket.io-client";
 
@@ -18,12 +18,7 @@ const App = () => {
           <Route path="/SignIn" element={<SignIn />} />
           <Route path="/MHPFormPage" element={<MHPFormPage />} />
           <Route path="/MainPage" element={<MainPage />} />
-          <Route
-            path="/CommentsPage"
-            element={
-              <CommentsPage commentsUrl="placeholder" currentUserId="1" />
-            }
-          />
+          <Route path="/PostsPage" element={<PostsPage />} />
           <Route path="/MessagesPage" element={<MessagesPage />} />
         </Routes>
       </Router>

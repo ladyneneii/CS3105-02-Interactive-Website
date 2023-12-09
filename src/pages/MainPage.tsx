@@ -102,34 +102,32 @@ const MainPage = () => {
                 return;
               }
             }
-
-            // get all locations from the database
-            try {
-              const response = await fetch(
-                "http://localhost:3001/api/locations"
-              );
-
-              if (response.ok) {
-                const locations_json = await response.json();
-                console.log(locations_json);
-
-                locations_json.forEach((location: LocationProps) => {
-                  const { Latitude, Longitude } = location;
-
-                  if (mapRef.current) {
-                    const otherMarker = L.marker([0, 0]).addTo(mapRef.current); // Use the ref
-
-                    otherMarker.setLatLng([Latitude, Longitude]);
-                  }
-                });
-              } else {
-                console.error("Failed to retrieve all locations");
-              }
-            } catch (error) {
-              console.error("Error during GET request:", error);
-            }
           } else {
             console.log("No user_details retrieved.");
+          }
+
+          // get all locations from the database
+          try {
+            const response = await fetch("http://localhost:3001/api/locations");
+
+            if (response.ok) {
+              const locations_json = await response.json();
+              console.log(locations_json);
+
+              locations_json.forEach((location: LocationProps) => {
+                const { Latitude, Longitude } = location;
+
+                if (mapRef.current) {
+                  const otherMarker = L.marker([0, 0]).addTo(mapRef.current); // Use the ref
+
+                  otherMarker.setLatLng([Latitude, Longitude]);
+                }
+              });
+            } else {
+              console.error("Failed to retrieve all locations");
+            }
+          } catch (error) {
+            console.error("Error during GET request:", error);
           }
         };
 
