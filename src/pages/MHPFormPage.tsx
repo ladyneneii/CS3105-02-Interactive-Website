@@ -95,7 +95,6 @@ const MHPFormPage = () => {
         ? [...prevValues, value]
         : prevValues.filter((val) => val !== value);
 
-      console.log(updatedValues); // Log the updated array
       setValidDisordersSpecialization(updatedValues.length > 0 ? true : false);
 
       return updatedValues;
@@ -113,7 +112,6 @@ const MHPFormPage = () => {
         ? [...prevValues, value]
         : prevValues.filter((val) => val !== value);
 
-      console.log(updatedValues); // Log the updated array
       setValidFees(updatedValues.length > 0 ? true : false);
 
       return updatedValues;
@@ -133,7 +131,6 @@ const MHPFormPage = () => {
         ? [...prevValues, value]
         : prevValues.filter((val) => val !== value);
 
-      console.log(updatedValues); // Log the updated array
       setValidAvailableDays(updatedValues.length > 0 ? true : false);
 
       return updatedValues;
@@ -153,7 +150,6 @@ const MHPFormPage = () => {
         ? [...prevValues, value]
         : prevValues.filter((val) => val !== value);
 
-      console.log(updatedValues); // Log the updated array
       setValidAvailableHours(updatedValues.length > 0 ? true : false);
 
       return updatedValues;

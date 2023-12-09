@@ -36,8 +36,7 @@ const MainPage = () => {
         let firstTime = true;
 
         const getPosition = async (position: PositionProps) => {
-          console.log("inside of getPosition");
-          // Ask for location
+          // Get coordinates
           const latitude = position.coords.latitude || 0;
           const longitude = position.coords.longitude || 0;
 
@@ -46,41 +45,62 @@ const MainPage = () => {
             firstTime = false;
           }
 
+          // user's location
           marker.setLatLng([latitude, longitude]);
-
-          console.log(latitude, longitude);
 
           const unparsed_user_details = localStorage.getItem("user_details");
 
           if (unparsed_user_details) {
-            const user_id = JSON.parse(unparsed_user_details)?.user_id;
+            // only add location to database if user is an mhp
+            if (JSON.parse(unparsed_user_details)?.Role === "mhp") {
+              const user_id = JSON.parse(unparsed_user_details)?.user_id;
+              // Get mhp_id and location from mhp user
+              try {
+                const response = await fetch(
+                  `http://localhost:3001/api/location_check/${user_id}`
+                );
 
-            const formData = new FormData();
+                if (response.ok) {
+                  const { user_id, location_id } = await response.json();
+                  const formData = new FormData();
 
-            formData.append("user_id", user_id);
-            formData.append("Latitude", latitude.toString());
-            formData.append("Longitude", longitude.toString());
-            formData.append("Address", "n/a");
+                  formData.append("user_id", user_id);
+                  formData.append("location_id", location_id);
+                  formData.append("Latitude", latitude.toString());
+                  formData.append("Longitude", longitude.toString());
+                  formData.append("Address", "n/a");
 
-            // add location to database
-            try {
-              // Make a POST request to server endpoint
-              const response = await fetch(
-                "http://localhost:3001/api/locations",
-                {
-                  method: "PUT",
-                  body: formData,
+                  // add location to database
+                  try {
+                    // Make a PUT request to server endpoint
+                    const response = await fetch(
+                      "http://localhost:3001/api/locations",
+                      {
+                        method: "PUT",
+                        body: formData,
+                      }
+                    );
+
+                    if (response.ok) {
+                      console.log("Successfully added/updated location.");
+                    } else {
+                      console.error(
+                        "Failed to add/update location to the database"
+                      );
+                    }
+                  } catch (error) {
+                    console.error("Error during POST request:", error);
+                  }
+                } else {
+                  console.error("Something is wrong.");
+
+                  return;
                 }
-              );
+              } catch (error) {
+                console.error("Error during GET request:", error);
 
-              if (response.ok) {
-                const res = await response.text();
-                console.log(res);
-              } else {
-                console.error("Failed to add/update location to the database");
+                return;
               }
-            } catch (error) {
-              console.error("Error during POST request:", error);
             }
 
             // get all locations from the database
