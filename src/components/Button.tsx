@@ -2,14 +2,14 @@ export interface ButtonProps {
   color: "primary" | "secondary" | "danger";
   children: string;
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  disabled: boolean; 
+  disabled?: boolean; 
 }
 
 const Button = ({ color, children, onClick, disabled }: ButtonProps) => {
   return (
     <button
       type="button"
-      className={`btn btn-${color}`}
+      className={`btn btn-${color} mb-3 me-3`}
       onClick={onClick}
       disabled={disabled} 
     >

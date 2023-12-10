@@ -2,16 +2,43 @@ import React, { useEffect, useRef, useState } from "react";
 import Navbar from "../components/Navbar";
 import Post from "../components/posts/Post";
 import Button from "../components/Button";
+import DisplayedPost from "../components/posts/DisplayedPost";
+
+interface PostProps {
+  post_id: string;
+  user_id: string;
+  Username: string;
+  Content: string;
+  date_time: string;
+}
 
 const PostsPage = () => {
   const postRef = useRef<HTMLTextAreaElement | null>(null);
   const [validPost, setValidPost] = useState(false);
-  const [post, setPost] = useState("");
+  const [postContent, setPostContent] = useState("");
+  const [allPosts, setAllPosts] = useState<PostProps[]>([]);
 
-  const handlePost = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newPost = e.target.value;
-    setPost(newPost);
-    setValidPost(newPost.length === 0 ? false : true);
+  const handlePostChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newPostContent = e.target.value;
+    setPostContent(newPostContent);
+    setValidPost(newPostContent.length === 0 ? false : true);
+  };
+
+  const getAllPosts = async () => {
+    // get all posts from the database
+    try {
+      const response = await fetch("http://localhost:3001/api/posts");
+
+      if (response.ok) {
+        const posts_json = await response.json();
+        console.log(posts_json);
+        setAllPosts(posts_json);
+      } else {
+        console.error("Failed to retrieve all posts");
+      }
+    } catch (error) {
+      console.error("Error during GET request:", error);
+    }
   };
 
   const handlePostSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -26,7 +53,7 @@ const PostsPage = () => {
 
       formData.append("user_id", user_id);
       formData.append("Username", Username);
-      formData.append("Content", post);
+      formData.append("Content", postContent);
       formData.append("date_time", new Date().toISOString());
 
       try {
@@ -37,6 +64,13 @@ const PostsPage = () => {
 
         if (response.ok) {
           console.log("Successfully added post to the database.");
+
+          getAllPosts();
+          // empty the value in textarea
+          if (postRef.current) {
+            postRef.current.value = "";
+            postRef.current?.focus();
+          }
         } else {
           console.error("Failed to add post to the database");
 
@@ -55,32 +89,6 @@ const PostsPage = () => {
   useEffect(() => {
     postRef.current?.focus();
 
-    const getAllPosts = async () => {
-      // get all posts from the database
-      try {
-        const response = await fetch("http://localhost:3001/api/posts");
-
-        if (response.ok) {
-          const posts_json = await response.json();
-          console.log(posts_json);
-
-          // posts_json.forEach((location: LocationProps) => {
-          //   const { Latitude, Longitude } = location;
-
-          //   if (mapRef.current) {
-          //     const otherMarker = L.marker([0, 0]).addTo(mapRef.current); // Use the ref
-
-          //     otherMarker.setLatLng([Latitude, Longitude]);
-          //   }
-          // });
-        } else {
-          console.error("Failed to retrieve all posts");
-        }
-      } catch (error) {
-        console.error("Error during GET request:", error);
-      }
-    };
-
     getAllPosts();
   }, []);
 
@@ -90,8 +98,25 @@ const PostsPage = () => {
       <section className="container-lg my-5">
         <h1 className="mb-4">Help Corner</h1>
 
-        <Post onChange={handlePost} color="primary" onClick={handlePostSubmit} disabled={!validPost}>Post</Post>
-        
+        <Post
+          postRef={postRef}
+          onChange={handlePostChange}
+          color="primary"
+          onClick={handlePostSubmit}
+          disabled={!validPost}
+        >
+          Post
+        </Post>
+
+        {allPosts.map(({ post_id, Username, Content, date_time }) => (
+          <DisplayedPost
+            key={post_id}
+            post_id={post_id}
+            Username={Username}
+            PostContent={Content}
+            date_time={date_time}
+          ></DisplayedPost>
+        ))}
       </section>
     </>
   );

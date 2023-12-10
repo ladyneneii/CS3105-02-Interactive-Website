@@ -1,21 +1,28 @@
-import React from 'react'
-import { ButtonProps } from '../Button';
-import Button from '../Button';
+import React, { useEffect, useState } from "react";
+import { ButtonProps } from "../Button";
+import Button from "../Button";
 
-interface PostProps extends ButtonProps {
+interface PostComponentProps extends ButtonProps {
+  postRef: React.RefObject<HTMLTextAreaElement>;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
-const Post = ({onChange, color, onClick, disabled, children}: PostProps) => {
+const Post = ({
+  postRef,
+  onChange,
+  color,
+  onClick,
+  disabled,
+  children,
+}: PostComponentProps) => {
   return (
     <>
       <div className="form-floating mb-3">
         <textarea
           className="form-control"
           placeholder="What's on your mind?"
-        //   ref={postRef}
+          ref={postRef}
           onChange={onChange}
-          id="post"
         ></textarea>
         <label htmlFor="post">What's on your mind?</label>
       </div>
@@ -24,6 +31,6 @@ const Post = ({onChange, color, onClick, disabled, children}: PostProps) => {
       </Button>
     </>
   );
-}
+};
 
-export default Post
+export default Post;

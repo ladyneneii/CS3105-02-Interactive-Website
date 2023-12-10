@@ -1,0 +1,8 @@
+.user_details {
+    display: flex;
+    align-items: center;
+}
+
+.empty_profile_picture_icon {
+  width: 60px;
+}
