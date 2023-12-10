@@ -1,9 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import empty_pfp from "../../assets/img/empty-profile-picture-612x612.jpg";
 import "../../styles/components/post.css";
 import Button from "../Button";
 import { getAllPosts } from "../../pages/PostsPage";
 import { PostProps } from "../../pages/PostsPage";
+import Post from "./Post";
 
 interface DisplayedPostComponentProps {
   key: string;
@@ -12,6 +13,8 @@ interface DisplayedPostComponentProps {
   Username: string;
   PostContent: string;
   date_time: string;
+  post_reply_id: string;
+  post_reply_level: number;
   setAllPosts: React.Dispatch<React.SetStateAction<PostProps[]>>;
 }
 
@@ -21,13 +24,19 @@ const DisplayedPost = ({
   Username,
   PostContent,
   date_time,
+  post_reply_id,
+  post_reply_level,
   setAllPosts,
 }: DisplayedPostComponentProps) => {
   const user_details_str = localStorage.getItem("user_details");
-  let logged_in_user_id = -1;
+  let logged_in_user_id = "-1";
+  let logged_in_username = "";
 
   if (user_details_str) {
     logged_in_user_id = JSON.parse(user_details_str).user_id;
+    logged_in_username = JSON.parse(user_details_str).Username;
+  } else {
+    console.error("user details not found in the local storage.");
   }
 
   const dateObject = new Date(date_time);
@@ -49,6 +58,10 @@ const DisplayedPost = ({
   const [postContent, setPostContent] = useState(PostContent);
   const [isEditing, setIsEditing] = useState(false);
   const [editedPostContent, setEditedPostContent] = useState(PostContent);
+  const replyRef = useRef<HTMLTextAreaElement | null>(null);
+  const [showReplyForm, setShowReplyForm] = useState(false);
+  const [validReply, setValidReply] = useState(false);
+  const [replyContent, setReplyContent] = useState("");
 
   const handleEditPostPending = () => {
     setIsEditing(true);
@@ -140,6 +153,57 @@ const DisplayedPost = ({
     }
   };
 
+  const handlePostReply = () => {
+    setShowReplyForm(true);
+    replyRef.current?.focus();
+  };
+
+  useEffect(() => {
+    if (showReplyForm && replyRef.current) {
+      replyRef.current.focus();
+    }
+  }, [showReplyForm]);
+
+  const handleReplyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newReplyContent = e.target.value;
+    setReplyContent(newReplyContent);
+    setValidReply(newReplyContent.length === 0 ? false : true);
+  };
+
+  const handleReplySubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("user_id", logged_in_user_id);
+    formData.append("Username", logged_in_username);
+    formData.append("Content", replyContent);
+    formData.append("date_time", new Date().toISOString());
+    formData.append("post_reply_id", post_id)
+    formData.append("post_reply_level", (post_reply_level + 1).toString())
+
+    try {
+      const response = await fetch("http://localhost:3001/api/posts", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        console.log("Successfully added reply to the database.");
+
+        getAllPosts().then((posts_json) => setAllPosts(posts_json));
+        setShowReplyForm(false)
+      } else {
+        console.error("Failed to add reply to the database");
+
+        return;
+      }
+    } catch (error) {
+      console.error("Error during POST request:", error);
+
+      return;
+    }
+  };
+
   return (
     <>
       <div className="container-md border rounded-4 shadow mb-3">
@@ -167,30 +231,48 @@ const DisplayedPost = ({
           ></textarea>
           <label htmlFor="post">What's on your mind?</label>
         </div>
-        { logged_in_user_id == parseInt(user_id, 10) &&
-          <div className="post_settings">
-            {!isEditing ? (
-              <>
-                <Button color="primary" onClick={handleEditPostPending}>
-                  Edit
-                </Button>
-                <Button color="danger" onClick={handleDeletePost}>
-                  Delete
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button color="primary" onClick={handleEditPostConfirm}>
-                  Confirm Edit
-                </Button>
-                <Button color="secondary" onClick={handleEditPostCancel}>
-                  Cancel
-                </Button>
-              </>
-            )}
-          </div>
-        }
+        <div className="post_settings">
+          <Button color="primary" onClick={handlePostReply}>
+            Reply
+          </Button>
+          {parseInt(logged_in_user_id, 10) === parseInt(user_id, 10) && (
+            <>
+              {!isEditing ? (
+                <>
+                  <Button color="primary" onClick={handleEditPostPending}>
+                    Edit
+                  </Button>
+                  <Button color="danger" onClick={handleDeletePost}>
+                    Delete
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button color="primary" onClick={handleEditPostConfirm}>
+                    Confirm Edit
+                  </Button>
+                  <Button color="secondary" onClick={handleEditPostCancel}>
+                    Cancel
+                  </Button>
+                </>
+              )}
+            </>
+          )}
+        </div>
       </div>
+      {showReplyForm && (
+        <Post
+          postRef={replyRef}
+          onChange={handleReplyChange}
+          color="primary"
+          onClick={handleReplySubmit}
+          disabled={!validReply}
+          replyMode={true}
+          setShowReplyForm={setShowReplyForm}
+        >
+          Confirm Reply
+        </Post>
+      )}
     </>
   );
 };

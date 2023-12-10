@@ -10,6 +10,8 @@ export interface PostProps {
   Username: string;
   Content: string;
   date_time: string;
+  post_reply_id: string;
+  post_reply_level: number;
 }
 
 export const getAllPosts = async () => {
@@ -96,8 +98,8 @@ const PostsPage = () => {
   return (
     <>
       <Navbar></Navbar>
-      <section className="container-lg my-5">
-        <h1 className="mb-4">Help Corner</h1>
+      <section className="container-lg my-5 overflow-x-auto">
+        <h1 className="mb-4">Safe Space</h1>
 
         <Post
           postRef={postRef}
@@ -105,11 +107,12 @@ const PostsPage = () => {
           color="primary"
           onClick={handlePostSubmit}
           disabled={!validPost}
+          replyMode={false}
         >
           Post
         </Post>
 
-        {allPosts.map(({ post_id, user_id, Username, Content, date_time }) => (
+        {allPosts.map(({ post_id, user_id, Username, Content, date_time, post_reply_id, post_reply_level }) => (
           <DisplayedPost
             key={post_id}
             post_id={post_id}
@@ -117,6 +120,8 @@ const PostsPage = () => {
             Username={Username}
             PostContent={Content}
             date_time={date_time}
+            post_reply_id={post_reply_id}
+            post_reply_level={post_reply_level}
             setAllPosts={setAllPosts}
           ></DisplayedPost>
         ))}

@@ -9,7 +9,7 @@ const Button = ({ color, children, onClick, disabled }: ButtonProps) => {
   return (
     <button
       type="button"
-      className={`btn btn-${color} mb-3 me-3`}
+      className={`btn btn-${color} mb-3 me-2`}
       onClick={onClick}
       disabled={disabled} 
     >
