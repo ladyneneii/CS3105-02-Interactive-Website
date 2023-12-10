@@ -13,6 +13,7 @@ interface DisplayedPostComponentProps {
   Username: string;
   PostContent: string;
   date_time: string;
+  State: string;
   post_reply_id: string;
   post_reply_level: number;
   setAllPosts: React.Dispatch<React.SetStateAction<PostProps[]>>;
@@ -24,6 +25,7 @@ const DisplayedPost = ({
   Username,
   PostContent,
   date_time,
+  State,
   post_reply_id,
   post_reply_level,
   setAllPosts,
@@ -62,6 +64,7 @@ const DisplayedPost = ({
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [validReply, setValidReply] = useState(false);
   const [replyContent, setReplyContent] = useState("");
+  const displayedReplyIndent = 0 + post_reply_level * 100;
 
   const handleEditPostPending = () => {
     setIsEditing(true);
@@ -178,8 +181,8 @@ const DisplayedPost = ({
     formData.append("Username", logged_in_username);
     formData.append("Content", replyContent);
     formData.append("date_time", new Date().toISOString());
-    formData.append("post_reply_id", post_id)
-    formData.append("post_reply_level", (post_reply_level + 1).toString())
+    formData.append("post_reply_id", post_id);
+    formData.append("post_reply_level", (post_reply_level + 1).toString());
 
     try {
       const response = await fetch("http://localhost:3001/api/posts", {
@@ -191,7 +194,7 @@ const DisplayedPost = ({
         console.log("Successfully added reply to the database.");
 
         getAllPosts().then((posts_json) => setAllPosts(posts_json));
-        setShowReplyForm(false)
+        setShowReplyForm(false);
       } else {
         console.error("Failed to add reply to the database");
 
@@ -206,59 +209,73 @@ const DisplayedPost = ({
 
   return (
     <>
-      <div className="container-md border rounded-4 shadow mb-3">
-        <div className="user_details my-2">
-          <img
-            src={empty_pfp}
-            alt="empty profile picture"
-            className="rounded-circle empty_profile_picture_icon"
-          />
-          <div className="username_date-time">
-            <p className="my-0 fw-semibold">{Username}</p>
-            <span className="fw-normal">
-              {formattedDate} {formattedTime}
-            </span>
-          </div>
-        </div>
-        <div className="form-floating mb-3">
-          <textarea
-            className="form-control"
-            placeholder="What's on your mind?"
-            value={isEditing ? editedPostContent : postContent}
-            ref={postRef}
-            onChange={handlePostEditChange}
-            readOnly={!isEditing}
-          ></textarea>
-          <label htmlFor="post">What's on your mind?</label>
-        </div>
-        <div className="post_settings">
-          <Button color="primary" onClick={handlePostReply}>
-            Reply
-          </Button>
-          {parseInt(logged_in_user_id, 10) === parseInt(user_id, 10) && (
-            <>
-              {!isEditing ? (
+      <div
+        className="container-md border rounded-4 shadow mb-3"
+        style={{
+          marginLeft: `calc(0px + ${displayedReplyIndent}px)`,
+          width: "100%",
+        }}
+      >
+        {State === "Visible" ? (
+          <>
+            <div className="user_details my-2">
+              <img
+                src={empty_pfp}
+                alt="empty profile picture"
+                className="rounded-circle empty_profile_picture_icon"
+              />
+              <div className="username_date-time">
+                <p className="my-0 fw-semibold">{Username}</p>
+                <span className="fw-normal">
+                  {formattedDate} {formattedTime}
+                </span>
+              </div>
+            </div>
+            <div className="form-floating mb-3">
+              <textarea
+                className="form-control"
+                placeholder="What's on your mind?"
+                value={isEditing ? editedPostContent : postContent}
+                ref={postRef}
+                onChange={handlePostEditChange}
+                readOnly={!isEditing}
+              ></textarea>
+              <label htmlFor="post">What's on your mind?</label>
+            </div>
+            <div className="post_settings">
+              <Button color="primary" onClick={handlePostReply}>
+                Reply
+              </Button>
+              {parseInt(logged_in_user_id, 10) === parseInt(user_id, 10) && (
                 <>
-                  <Button color="primary" onClick={handleEditPostPending}>
-                    Edit
-                  </Button>
-                  <Button color="danger" onClick={handleDeletePost}>
-                    Delete
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button color="primary" onClick={handleEditPostConfirm}>
-                    Confirm Edit
-                  </Button>
-                  <Button color="secondary" onClick={handleEditPostCancel}>
-                    Cancel
-                  </Button>
+                  {!isEditing ? (
+                    <>
+                      <Button color="primary" onClick={handleEditPostPending}>
+                        Edit
+                      </Button>
+                      <Button color="danger" onClick={handleDeletePost}>
+                        Delete
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button color="primary" onClick={handleEditPostConfirm}>
+                        Confirm Edit
+                      </Button>
+                      <Button color="secondary" onClick={handleEditPostCancel}>
+                        Cancel
+                      </Button>
+                    </>
+                  )}
                 </>
               )}
-            </>
-          )}
-        </div>
+            </div>
+          </>
+        ) : State === "DeletedReply" ? (
+          <p className="my-3 text-center fw-semibold">Deleted</p>
+        ) : State === "HiddenReply" ? (
+          <p>Hidden</p>
+        ) : null}
       </div>
       {showReplyForm && (
         <Post
@@ -269,6 +286,7 @@ const DisplayedPost = ({
           disabled={!validReply}
           replyMode={true}
           setShowReplyForm={setShowReplyForm}
+          postReplyLevel={post_reply_level}
         >
           Confirm Reply
         </Post>

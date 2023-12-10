@@ -7,6 +7,7 @@ interface PostComponentProps extends ButtonProps {
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   replyMode: boolean;
   setShowReplyForm?: React.Dispatch<React.SetStateAction<boolean>>;
+  postReplyLevel: number;
 }
 
 const Post = ({
@@ -18,8 +19,9 @@ const Post = ({
   children,
   replyMode,
   setShowReplyForm,
+  postReplyLevel
 }: PostComponentProps) => {
-  const replyIndent = !replyMode ? 0 : 100
+  const replyIndent = (postReplyLevel + 1) * 100;
 
   const handleReplyCancel = () => {
     if (setShowReplyForm) {

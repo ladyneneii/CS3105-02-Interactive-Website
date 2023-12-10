@@ -10,6 +10,7 @@ export interface PostProps {
   Username: string;
   Content: string;
   date_time: string;
+  State: string;
   post_reply_id: string;
   post_reply_level: number;
 }
@@ -108,11 +109,12 @@ const PostsPage = () => {
           onClick={handlePostSubmit}
           disabled={!validPost}
           replyMode={false}
+          postReplyLevel={-1}
         >
           Post
         </Post>
 
-        {allPosts.map(({ post_id, user_id, Username, Content, date_time, post_reply_id, post_reply_level }) => (
+        {allPosts.map(({ post_id, user_id, Username, Content, date_time, State, post_reply_id, post_reply_level }) => (
           <DisplayedPost
             key={post_id}
             post_id={post_id}
@@ -120,6 +122,7 @@ const PostsPage = () => {
             Username={Username}
             PostContent={Content}
             date_time={date_time}
+            State={State}
             post_reply_id={post_reply_id}
             post_reply_level={post_reply_level}
             setAllPosts={setAllPosts}
