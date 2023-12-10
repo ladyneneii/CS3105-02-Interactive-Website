@@ -2,21 +2,34 @@ import React, { useRef, useState } from "react";
 import empty_pfp from "../../assets/img/empty-profile-picture-612x612.jpg";
 import "../../styles/components/post.css";
 import Button from "../Button";
+import { getAllPosts } from "../../pages/PostsPage";
+import { PostProps } from "../../pages/PostsPage";
 
 interface DisplayedPostComponentProps {
   key: string;
   post_id: string;
+  user_id: string;
   Username: string;
   PostContent: string;
   date_time: string;
+  setAllPosts: React.Dispatch<React.SetStateAction<PostProps[]>>;
 }
 
 const DisplayedPost = ({
   post_id,
+  user_id,
   Username,
   PostContent,
   date_time,
+  setAllPosts,
 }: DisplayedPostComponentProps) => {
+  const user_details_str = localStorage.getItem("user_details");
+  let logged_in_user_id = -1;
+
+  if (user_details_str) {
+    logged_in_user_id = JSON.parse(user_details_str).user_id;
+  }
+
   const dateObject = new Date(date_time);
   const optionsDate: Intl.DateTimeFormatOptions = {
     year: "numeric",
@@ -72,9 +85,9 @@ const DisplayedPost = ({
     }
     setPostContent(editedPostContent);
 
-    const formData = new FormData()
-    formData.append("post_id", post_id)
-    formData.append("Content", editedPostContent)
+    const formData = new FormData();
+    formData.append("post_id", post_id);
+    formData.append("Content", editedPostContent);
 
     // update post content on the database
     try {
@@ -92,6 +105,36 @@ const DisplayedPost = ({
       }
     } catch (error) {
       console.error("Error during PATCH request:", error);
+
+      return;
+    }
+  };
+
+  const handleDeletePost = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("post_id", post_id);
+
+    // remove post from the database
+    try {
+      const response = await fetch("http://localhost:3001/api/posts", {
+        method: "DELETE",
+        body: formData,
+      });
+
+      if (response.ok) {
+        console.log("Successfully removed post from the database.");
+
+        // reload all the posts excluding the deleted one
+        getAllPosts().then((posts_json) => setAllPosts(posts_json));
+      } else {
+        console.error("Failed to delete post from the database");
+
+        return;
+      }
+    } catch (error) {
+      console.error("Error during DELETE request:", error);
 
       return;
     }
@@ -124,22 +167,29 @@ const DisplayedPost = ({
           ></textarea>
           <label htmlFor="post">What's on your mind?</label>
         </div>
-        <div className="post_settings">
-          {!isEditing ? (
-            <Button color="primary" onClick={handleEditPostPending}>
-              Edit
-            </Button>
-          ) : (
-            <>
-              <Button color="primary" onClick={handleEditPostConfirm}>
-                Confirm Edit
-              </Button>
-              <Button color="secondary" onClick={handleEditPostCancel}>
-                Cancel
-              </Button>
-            </>
-          )}
-        </div>
+        { logged_in_user_id == parseInt(user_id, 10) &&
+          <div className="post_settings">
+            {!isEditing ? (
+              <>
+                <Button color="primary" onClick={handleEditPostPending}>
+                  Edit
+                </Button>
+                <Button color="danger" onClick={handleDeletePost}>
+                  Delete
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button color="primary" onClick={handleEditPostConfirm}>
+                  Confirm Edit
+                </Button>
+                <Button color="secondary" onClick={handleEditPostCancel}>
+                  Cancel
+                </Button>
+              </>
+            )}
+          </div>
+        }
       </div>
     </>
   );

@@ -4,13 +4,31 @@ import Post from "../components/posts/Post";
 import Button from "../components/Button";
 import DisplayedPost from "../components/posts/DisplayedPost";
 
-interface PostProps {
+export interface PostProps {
   post_id: string;
   user_id: string;
   Username: string;
   Content: string;
   date_time: string;
 }
+
+export const getAllPosts = async () => {
+  // get all posts from the database
+  try {
+    const response = await fetch("http://localhost:3001/api/posts");
+
+    if (response.ok) {
+      const posts_json = await response.json();
+      console.log(posts_json);
+
+      return posts_json;
+    } else {
+      console.error("Failed to retrieve all posts");
+    }
+  } catch (error) {
+    console.error("Error during GET request:", error);
+  }
+};
 
 const PostsPage = () => {
   const postRef = useRef<HTMLTextAreaElement | null>(null);
@@ -22,23 +40,6 @@ const PostsPage = () => {
     const newPostContent = e.target.value;
     setPostContent(newPostContent);
     setValidPost(newPostContent.length === 0 ? false : true);
-  };
-
-  const getAllPosts = async () => {
-    // get all posts from the database
-    try {
-      const response = await fetch("http://localhost:3001/api/posts");
-
-      if (response.ok) {
-        const posts_json = await response.json();
-        console.log(posts_json);
-        setAllPosts(posts_json);
-      } else {
-        console.error("Failed to retrieve all posts");
-      }
-    } catch (error) {
-      console.error("Error during GET request:", error);
-    }
   };
 
   const handlePostSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -65,7 +66,7 @@ const PostsPage = () => {
         if (response.ok) {
           console.log("Successfully added post to the database.");
 
-          getAllPosts();
+          getAllPosts().then((posts_json) => setAllPosts(posts_json));
           // empty the value in textarea
           if (postRef.current) {
             postRef.current.value = "";
@@ -89,7 +90,7 @@ const PostsPage = () => {
   useEffect(() => {
     postRef.current?.focus();
 
-    getAllPosts();
+    getAllPosts().then((posts_json) => setAllPosts(posts_json));
   }, []);
 
   return (
@@ -108,13 +109,15 @@ const PostsPage = () => {
           Post
         </Post>
 
-        {allPosts.map(({ post_id, Username, Content, date_time }) => (
+        {allPosts.map(({ post_id, user_id, Username, Content, date_time }) => (
           <DisplayedPost
             key={post_id}
             post_id={post_id}
+            user_id={user_id}
             Username={Username}
             PostContent={Content}
             date_time={date_time}
+            setAllPosts={setAllPosts}
           ></DisplayedPost>
         ))}
       </section>
