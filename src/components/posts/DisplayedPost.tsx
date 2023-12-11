@@ -5,6 +5,8 @@ import Button from "../Button";
 import { getAllPosts } from "../../pages/PostsPage";
 import { PostProps } from "../../pages/PostsPage";
 import Post from "./Post";
+import { replies } from "../../pages/PostsPage";
+import { storeReplies } from "../../pages/PostsPage";
 
 interface DisplayedPostComponentProps {
   key: string;
@@ -17,6 +19,7 @@ interface DisplayedPostComponentProps {
   post_reply_id: string;
   post_reply_level: number;
   setAllPosts: React.Dispatch<React.SetStateAction<PostProps[]>>;
+  currentPostReplies: PostProps[];
 }
 
 const DisplayedPost = ({
@@ -29,6 +32,7 @@ const DisplayedPost = ({
   post_reply_id,
   post_reply_level,
   setAllPosts,
+  currentPostReplies,
 }: DisplayedPostComponentProps) => {
   const user_details_str = localStorage.getItem("user_details");
   let logged_in_user_id = "-1";
@@ -64,7 +68,8 @@ const DisplayedPost = ({
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [validReply, setValidReply] = useState(false);
   const [replyContent, setReplyContent] = useState("");
-  const displayedReplyIndent = 0 + post_reply_level * 100;
+  const [showReplies, setShowReplies] = useState(false);
+  const post_reply_level_current = post_reply_level;
 
   const handleEditPostPending = () => {
     setIsEditing(true);
@@ -195,6 +200,7 @@ const DisplayedPost = ({
 
         getAllPosts().then((posts_json) => setAllPosts(posts_json));
         setShowReplyForm(false);
+        setShowReplies(true);
       } else {
         console.error("Failed to add reply to the database");
 
@@ -207,12 +213,16 @@ const DisplayedPost = ({
     }
   };
 
+  const handlePostViewReplies = () => {
+    setShowReplies(true);
+  };
+
   return (
     <>
       <div
-        className="container-md border rounded-4 shadow mb-3"
+        className="container-md bg-light bg-gradient border rounded-4 shadow mb-3"
         style={{
-          marginLeft: `calc(0px + ${displayedReplyIndent}px)`,
+          marginLeft: post_reply_level > 0 ? "50px": "0px",
           width: "100%",
         }}
       >
@@ -242,40 +252,81 @@ const DisplayedPost = ({
               ></textarea>
               <label htmlFor="post">What's on your mind?</label>
             </div>
-            <div className="post_settings">
-              <Button color="primary" onClick={handlePostReply}>
-                Reply
-              </Button>
-              {parseInt(logged_in_user_id, 10) === parseInt(user_id, 10) && (
-                <>
-                  {!isEditing ? (
-                    <>
-                      <Button color="primary" onClick={handleEditPostPending}>
-                        Edit
-                      </Button>
-                      <Button color="danger" onClick={handleDeletePost}>
-                        Delete
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button color="primary" onClick={handleEditPostConfirm}>
-                        Confirm Edit
-                      </Button>
-                      <Button color="secondary" onClick={handleEditPostCancel}>
-                        Cancel
-                      </Button>
-                    </>
-                  )}
-                </>
-              )}
-            </div>
           </>
         ) : State === "DeletedReply" ? (
           <p className="my-3 text-center fw-semibold">Deleted</p>
         ) : State === "HiddenReply" ? (
-          <p>Hidden</p>
+          <p className="my-3 text-center fw-semibold">Hidden</p>
         ) : null}
+        <div className="post_settings">
+          <Button color="primary" onClick={handlePostReply}>
+            Reply
+          </Button>
+          {currentPostReplies.length > 0 && (
+            <Button color="secondary" onClick={handlePostViewReplies}>
+              View Replies
+            </Button>
+          )}
+          {parseInt(logged_in_user_id, 10) === parseInt(user_id, 10) && (
+            <>
+              {!isEditing ? (
+                <>
+                  <Button color="primary" onClick={handleEditPostPending}>
+                    Edit
+                  </Button>
+                  <Button color="danger" onClick={handleDeletePost}>
+                    Delete
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button color="primary" onClick={handleEditPostConfirm}>
+                    Confirm Edit
+                  </Button>
+                  <Button color="secondary" onClick={handleEditPostCancel}>
+                    Cancel
+                  </Button>
+                </>
+              )}
+            </>
+          )}
+        </div>
+        {showReplies &&
+          currentPostReplies.map(
+            (
+              {
+                post_id,
+                user_id,
+                Username,
+                Content,
+                date_time,
+                State,
+                post_reply_id,
+                post_reply_level,
+              },
+              index
+            ) =>
+              storeReplies(
+                currentPostReplies,
+                index,
+                post_reply_level_current + 1
+              ) &&
+              post_reply_level === post_reply_level_current + 1 && (
+                <DisplayedPost
+                  key={post_id}
+                  post_id={post_id}
+                  user_id={user_id}
+                  Username={Username}
+                  PostContent={Content}
+                  date_time={date_time}
+                  State={State}
+                  post_reply_id={post_reply_id}
+                  post_reply_level={post_reply_level}
+                  setAllPosts={setAllPosts}
+                  currentPostReplies={replies}
+                ></DisplayedPost>
+              )
+          )}
       </div>
       {showReplyForm && (
         <Post

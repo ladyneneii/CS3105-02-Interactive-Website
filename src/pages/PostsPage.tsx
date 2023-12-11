@@ -33,6 +33,28 @@ export const getAllPosts = async () => {
   }
 };
 
+export let replies: PostProps[] = [];
+
+export const storeReplies = (
+  allPosts: PostProps[],
+  index: number,
+  rootPostReplyLevel: number
+) => {
+  // reset replies array
+  replies = [];
+  for (
+    let i = index + 1;
+    i < allPosts.length && allPosts[i]["post_reply_level"] > rootPostReplyLevel;
+    i++
+  ) {
+    replies.push(allPosts[i]);
+  }
+
+  // console.log(`Replies to post_id ${allPosts[index]["post_id"]}: ${replies}`);
+
+  return true;
+};
+
 const PostsPage = () => {
   const postRef = useRef<HTMLTextAreaElement | null>(null);
   const [validPost, setValidPost] = useState(false);
@@ -59,6 +81,7 @@ const PostsPage = () => {
       formData.append("Username", Username);
       formData.append("Content", postContent);
       formData.append("date_time", new Date().toISOString());
+      formData.append("post_reply_level", "0");
 
       try {
         const response = await fetch("http://localhost:3001/api/posts", {
@@ -114,20 +137,37 @@ const PostsPage = () => {
           Post
         </Post>
 
-        {allPosts.map(({ post_id, user_id, Username, Content, date_time, State, post_reply_id, post_reply_level }) => (
-          <DisplayedPost
-            key={post_id}
-            post_id={post_id}
-            user_id={user_id}
-            Username={Username}
-            PostContent={Content}
-            date_time={date_time}
-            State={State}
-            post_reply_id={post_reply_id}
-            post_reply_level={post_reply_level}
-            setAllPosts={setAllPosts}
-          ></DisplayedPost>
-        ))}
+        {allPosts.map(
+          (
+            {
+              post_id,
+              user_id,
+              Username,
+              Content,
+              date_time,
+              State,
+              post_reply_id,
+              post_reply_level,
+            },
+            index
+          ) =>
+            storeReplies(allPosts, index, 0) &&
+            post_reply_level === 0 && (
+              <DisplayedPost
+                key={post_id}
+                post_id={post_id}
+                user_id={user_id}
+                Username={Username}
+                PostContent={Content}
+                date_time={date_time}
+                State={State}
+                post_reply_id={post_reply_id}
+                post_reply_level={post_reply_level}
+                setAllPosts={setAllPosts}
+                currentPostReplies={replies}
+              ></DisplayedPost>
+            )
+        )}
       </section>
     </>
   );

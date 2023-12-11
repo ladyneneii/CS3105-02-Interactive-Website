@@ -19,9 +19,10 @@ const Post = ({
   children,
   replyMode,
   setShowReplyForm,
-  postReplyLevel
+  postReplyLevel,
 }: PostComponentProps) => {
-  const replyIndent = (postReplyLevel + 1) * 100;
+  const replyIndent = postReplyLevel === 0 ? 65 : replyMode ? 115 : 0;
+  console.log(replyIndent);
 
   const handleReplyCancel = () => {
     if (setShowReplyForm) {
@@ -31,7 +32,12 @@ const Post = ({
 
   return (
     <>
-      <div style={{ marginLeft: `calc(0px + ${replyIndent}px)`, width: "100%" }}>
+      <div
+        style={{
+          marginLeft: `${replyIndent}px`,
+          width: "100%",
+        }}
+      >
         <div className="form-floating mb-3">
           <textarea
             className="form-control"
