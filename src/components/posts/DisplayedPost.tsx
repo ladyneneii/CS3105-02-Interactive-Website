@@ -217,12 +217,16 @@ const DisplayedPost = ({
     setShowReplies(true);
   };
 
+  const handlePostHideReplies = () => {
+    setShowReplies(false);
+  };
+
   return (
     <>
       <div
         className="container-md bg-light bg-gradient border rounded-4 shadow mb-3"
         style={{
-          marginLeft: post_reply_level > 0 ? "50px": "0px",
+          marginLeft: post_reply_level > 0 ? "50px" : "0px",
           width: "100%",
         }}
       >
@@ -262,11 +266,16 @@ const DisplayedPost = ({
           <Button color="primary" onClick={handlePostReply}>
             Reply
           </Button>
-          {currentPostReplies.length > 0 && (
-            <Button color="secondary" onClick={handlePostViewReplies}>
-              View Replies
-            </Button>
-          )}
+          {currentPostReplies.length > 0 &&
+            (!showReplies ? (
+              <Button color="secondary" onClick={handlePostViewReplies}>
+                View Replies
+              </Button>
+            ) : (
+              <Button color="secondary" onClick={handlePostHideReplies}>
+                Hide Replies
+              </Button>
+            ))}
           {parseInt(logged_in_user_id, 10) === parseInt(user_id, 10) && (
             <>
               {!isEditing ? (
