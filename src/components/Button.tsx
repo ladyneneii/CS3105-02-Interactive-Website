@@ -1,5 +1,5 @@
 export interface ButtonProps {
-  color: "primary" | "secondary" | "danger";
+  color: "primary" | "secondary" | "danger" | "warning";
   children: string;
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean; 

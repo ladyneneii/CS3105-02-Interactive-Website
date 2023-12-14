@@ -18,6 +18,11 @@ interface DisplayedPostComponentProps {
   State: string;
   post_reply_id: string;
   post_reply_level: number;
+  Type: string;
+  Privacy: string;
+  Remark: string;
+  post_edit_id: string;
+  isEdited: number;
   setAllPosts: React.Dispatch<React.SetStateAction<PostProps[]>>;
   currentPostReplies: PostProps[];
 }
@@ -31,6 +36,11 @@ const DisplayedPost = ({
   State,
   post_reply_id,
   post_reply_level,
+  Type,
+  Privacy,
+  Remark,
+  post_edit_id,
+  isEdited,
   setAllPosts,
   currentPostReplies,
 }: DisplayedPostComponentProps) => {
@@ -70,6 +80,10 @@ const DisplayedPost = ({
   const [replyContent, setReplyContent] = useState("");
   const [showReplies, setShowReplies] = useState(false);
   const post_reply_level_current = post_reply_level;
+
+  const [showRemark, setShowRemark] = useState(false);
+  const remarkRef = useRef<HTMLInputElement | null>(null);
+  const privacyRef = useRef<HTMLSelectElement | null>(null);
 
   const handleEditPostPending = () => {
     setIsEditing(true);
@@ -137,25 +151,53 @@ const DisplayedPost = ({
     const formData = new FormData();
     formData.append("post_id", post_id);
 
-    // remove post from the database
+    if (window.confirm("Confirm deletion? If this post does not have replies, the action cannot be undone.")) {
+      // remove post from the database
+      try {
+        const response = await fetch("http://localhost:3001/api/posts", {
+          method: "DELETE",
+          body: formData,
+        });
+
+        if (response.ok) {
+          console.log("Successfully removed post from the database.");
+
+          // reload all the posts excluding the deleted one
+          getAllPosts().then((posts_json) => setAllPosts(posts_json));
+        } else {
+          console.error("Failed to delete post from the database");
+
+          return;
+        }
+      } catch (error) {
+        console.error("Error during DELETE request:", error);
+
+        return;
+      }
+    }
+  };
+
+  const handleUndoDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
     try {
-      const response = await fetch("http://localhost:3001/api/posts", {
-        method: "DELETE",
-        body: formData,
-      });
+      const response = await fetch(
+        `http://localhost:3001/api/undo_delete_post/${post_id}`,
+        {
+          method: "PATCH",
+        }
+      );
 
       if (response.ok) {
-        console.log("Successfully removed post from the database.");
-
-        // reload all the posts excluding the deleted one
+        console.log("Successfully undid delete.");
         getAllPosts().then((posts_json) => setAllPosts(posts_json));
       } else {
-        console.error("Failed to delete post from the database");
+        console.error("Failed to undo delete.");
 
         return;
       }
     } catch (error) {
-      console.error("Error during DELETE request:", error);
+      console.error("Error during PATCH request:", error);
 
       return;
     }
@@ -257,28 +299,41 @@ const DisplayedPost = ({
               <label htmlFor="post">What's on your mind?</label>
             </div>
           </>
-        ) : State === "DeletedReply" ? (
+        ) : State === "MarkedDeleted" ? (
           <p className="my-3 text-center fw-semibold">Deleted</p>
-        ) : State === "HiddenReply" ? (
+        ) : State === "MarkedHidden" ? (
           <p className="my-3 text-center fw-semibold">Hidden</p>
         ) : null}
         <div className="post_settings">
-          <Button color="primary" onClick={handlePostReply}>
+          <Button
+            color="primary"
+            onClick={handlePostReply}
+            disabled={isEditing ? true : false}
+          >
             Reply
           </Button>
           {currentPostReplies.length > 0 &&
             (!showReplies ? (
-              <Button color="secondary" onClick={handlePostViewReplies}>
+              <Button
+                color="primary"
+                onClick={handlePostViewReplies}
+                disabled={isEditing ? true : false}
+              >
                 View Replies
               </Button>
             ) : (
-              <Button color="secondary" onClick={handlePostHideReplies}>
+              <Button color="primary" onClick={handlePostHideReplies}>
                 Hide Replies
               </Button>
             ))}
+          {/* If displayed post belongs to logged in user */}
           {parseInt(logged_in_user_id, 10) === parseInt(user_id, 10) && (
             <>
-              {!isEditing ? (
+              {State === "MarkedDeleted" ? (
+                <Button color="primary" onClick={handleUndoDelete}>
+                  Undo Delete
+                </Button>
+              ) : !isEditing ? (
                 <>
                   <Button color="primary" onClick={handleEditPostPending}>
                     Edit
@@ -292,7 +347,7 @@ const DisplayedPost = ({
                   <Button color="primary" onClick={handleEditPostConfirm}>
                     Confirm Edit
                   </Button>
-                  <Button color="secondary" onClick={handleEditPostCancel}>
+                  <Button color="danger" onClick={handleEditPostCancel}>
                     Cancel
                   </Button>
                 </>
@@ -331,6 +386,11 @@ const DisplayedPost = ({
                   State={State}
                   post_reply_id={post_reply_id}
                   post_reply_level={post_reply_level}
+                  Type={Type}
+                  Privacy={Privacy}
+                  Remark={Remark}
+                  post_edit_id={post_edit_id}
+                  isEdited={isEdited}
                   setAllPosts={setAllPosts}
                   currentPostReplies={replies}
                 ></DisplayedPost>
@@ -347,6 +407,10 @@ const DisplayedPost = ({
           replyMode={true}
           setShowReplyForm={setShowReplyForm}
           postReplyLevel={post_reply_level}
+          showRemark={showRemark}
+          setShowRemark={setShowRemark}
+          remarkRef={remarkRef}
+          privacyRef={privacyRef}
         >
           Confirm Reply
         </Post>

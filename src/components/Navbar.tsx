@@ -64,7 +64,7 @@ const Navbar = () => {
             </li>
             <li className="nav-item">
               <Link to="/PostsPage" className="nav-link">
-                Help Corner
+                Safe Space
               </Link>
             </li>
             <li className="nav-item">

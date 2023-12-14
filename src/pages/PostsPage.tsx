@@ -13,6 +13,11 @@ export interface PostProps {
   State: string;
   post_reply_id: string;
   post_reply_level: number;
+  Type: string;
+  Privacy: string;
+  Remark: string;
+  post_edit_id: string;
+  isEdited: number;
 }
 
 export const getAllPosts = async () => {
@@ -60,6 +65,9 @@ const PostsPage = () => {
   const [validPost, setValidPost] = useState(false);
   const [postContent, setPostContent] = useState("");
   const [allPosts, setAllPosts] = useState<PostProps[]>([]);
+  const [showRemark, setShowRemark] = useState(false);
+  const remarkRef = useRef<HTMLInputElement | null>(null);
+  const privacyRef = useRef<HTMLSelectElement | null>(null);
 
   const handlePostChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newPostContent = e.target.value;
@@ -81,7 +89,17 @@ const PostsPage = () => {
       formData.append("Username", Username);
       formData.append("Content", postContent);
       formData.append("date_time", new Date().toISOString());
+      // State is Visible by default
       formData.append("post_reply_level", "0");
+      formData.append("Type", showRemark ? "Triggering" : "Normal");
+      formData.append(
+        "Privacy",
+        privacyRef.current ? privacyRef.current.value : "n/a"
+      );
+      formData.append(
+        "Remark",
+        remarkRef.current ? remarkRef.current.value : "n/a"
+      );
 
       try {
         const response = await fetch("http://localhost:3001/api/posts", {
@@ -133,6 +151,10 @@ const PostsPage = () => {
           disabled={!validPost}
           replyMode={false}
           postReplyLevel={-1}
+          showRemark={showRemark}
+          setShowRemark={setShowRemark}
+          remarkRef={remarkRef}
+          privacyRef={privacyRef}
         >
           Post
         </Post>
@@ -148,6 +170,11 @@ const PostsPage = () => {
               State,
               post_reply_id,
               post_reply_level,
+              Type,
+              Privacy,
+              Remark,
+              post_edit_id,
+              isEdited
             },
             index
           ) =>
@@ -163,6 +190,11 @@ const PostsPage = () => {
                 State={State}
                 post_reply_id={post_reply_id}
                 post_reply_level={post_reply_level}
+                Type={Type}
+                Privacy={Privacy}
+                Remark={Remark}
+                post_edit_id={post_edit_id}
+                isEdited={isEdited}
                 setAllPosts={setAllPosts}
                 currentPostReplies={replies}
               ></DisplayedPost>

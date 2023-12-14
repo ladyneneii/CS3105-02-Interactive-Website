@@ -575,21 +575,18 @@ const Register = () => {
             </div>
 
             <div className="mb-3 col">
-              <label className="form-label">Gender</label>
-              <select className="form-select" id="gender" defaultValue="n/a">
-                <option value="n/a" disabled>
-                  Select your gender
-                </option>
+              <label className="form-label">Gender (Optional)</label>
+              <select className="form-select" id="gender" defaultValue="PNTS">
+                <option value="PNTS">Prefer not to say</option>
                 <option value="Woman">Woman</option>
                 <option value="Non-Binary">Non-Binary</option>
                 <option value="Man">Man</option>
                 <option value="Others">Others</option>
-                <option value="PNTS">Prefer Not to Say</option>
               </select>
             </div>
 
             <div className="mb-3 col">
-              <label className="form-label">Pronouns</label>
+              <label className="form-label">Pronouns (Optional)</label>
               <input
                 type="text"
                 className="form-control"

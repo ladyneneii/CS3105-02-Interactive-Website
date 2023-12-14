@@ -1106,7 +1106,7 @@ const MHPFormPage = () => {
               onChange={handleNotes}
             ></textarea>
             <label htmlFor="floatingTextarea">
-              Leave additional information here:
+              Leave additional information here (Optional):
             </label>
           </div>
 
