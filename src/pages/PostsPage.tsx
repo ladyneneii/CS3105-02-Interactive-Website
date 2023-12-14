@@ -62,17 +62,27 @@ export const storeReplies = (
 
 const PostsPage = () => {
   const postRef = useRef<HTMLTextAreaElement | null>(null);
-  const [validPost, setValidPost] = useState(false);
+  const [validContent, setValidContent] = useState(false);
+  const [validRemark, setValidRemark] = useState(false);
+  const [dummyState, setDummyState] = useState(false);
   const [postContent, setPostContent] = useState("");
   const [allPosts, setAllPosts] = useState<PostProps[]>([]);
   const [showRemark, setShowRemark] = useState(false);
   const remarkRef = useRef<HTMLInputElement | null>(null);
   const privacyRef = useRef<HTMLSelectElement | null>(null);
 
-  const handlePostChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handlePostContentChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
     const newPostContent = e.target.value;
     setPostContent(newPostContent);
-    setValidPost(newPostContent.length === 0 ? false : true);
+    setValidContent(newPostContent.length === 0 ? false : true);
+  };
+
+  const handleRemarkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newRemarkContent = e.target.value;
+    setValidRemark(newRemarkContent.length === 0 ? false : true);
+    //  console logging may be delayed but the disabledSubmitBtn property of the button will toggle correctly.
   };
 
   const handlePostSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -116,6 +126,8 @@ const PostsPage = () => {
             postRef.current.value = "";
             postRef.current?.focus();
           }
+          setShowRemark(false);
+          setValidContent(false);
         } else {
           console.error("Failed to add post to the database");
 
@@ -145,16 +157,21 @@ const PostsPage = () => {
 
         <Post
           postRef={postRef}
-          onChange={handlePostChange}
+          onChange={handlePostContentChange}
+          onChangeRemark={handleRemarkChange}
           color="primary"
           onClick={handlePostSubmit}
-          disabled={!validPost}
+          // disabled={disabledSubmitBtn}
+          disabled={
+            remarkRef.current ? !validContent || !validRemark : !validContent
+          }
           replyMode={false}
           postReplyLevel={-1}
           showRemark={showRemark}
           setShowRemark={setShowRemark}
           remarkRef={remarkRef}
           privacyRef={privacyRef}
+          setDummyState={setDummyState}
         >
           Post
         </Post>
@@ -174,7 +191,7 @@ const PostsPage = () => {
               Privacy,
               Remark,
               post_edit_id,
-              isEdited
+              isEdited,
             },
             index
           ) =>

@@ -71,7 +71,11 @@ const DisplayedPost = ({
   const formattedTime = dateObject.toLocaleTimeString(undefined, optionsTime);
 
   const postRef = useRef<HTMLTextAreaElement | null>(null);
+  const [showPostContent, setShowPostContent] = useState(
+    Type === "Normal" ? true : false
+  );
   const [postContent, setPostContent] = useState(PostContent);
+  const [dummyState, setDummyState] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedPostContent, setEditedPostContent] = useState(PostContent);
   const replyRef = useRef<HTMLTextAreaElement | null>(null);
@@ -81,9 +85,23 @@ const DisplayedPost = ({
   const [showReplies, setShowReplies] = useState(false);
   const post_reply_level_current = post_reply_level;
 
+  const [validRemark, setValidRemark] = useState(false);
   const [showRemark, setShowRemark] = useState(false);
   const remarkRef = useRef<HTMLInputElement | null>(null);
   const privacyRef = useRef<HTMLSelectElement | null>(null);
+
+  const readTriggeringPost = () => {
+    setShowPostContent(true);
+  };
+
+  const hidePostContent = () => {
+    setShowPostContent(false);
+  };
+
+  const handleRemarkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newRemarkContent = e.target.value;
+    setValidRemark(newRemarkContent.length === 0 ? false : true);
+  };
 
   const handleEditPostPending = () => {
     setIsEditing(true);
@@ -151,7 +169,11 @@ const DisplayedPost = ({
     const formData = new FormData();
     formData.append("post_id", post_id);
 
-    if (window.confirm("Confirm deletion? If this post does not have replies, the action cannot be undone.")) {
+    if (
+      window.confirm(
+        "Confirm deletion? If this post does not have replies, the action cannot be undone."
+      )
+    ) {
       // remove post from the database
       try {
         const response = await fetch("http://localhost:3001/api/posts", {
@@ -230,6 +252,15 @@ const DisplayedPost = ({
     formData.append("date_time", new Date().toISOString());
     formData.append("post_reply_id", post_id);
     formData.append("post_reply_level", (post_reply_level + 1).toString());
+    formData.append("Type", showRemark ? "Triggering" : "Normal");
+    formData.append(
+      "Privacy",
+      privacyRef.current ? privacyRef.current.value : "n/a"
+    );
+    formData.append(
+      "Remark",
+      remarkRef.current ? remarkRef.current.value : "n/a"
+    );
 
     try {
       const response = await fetch("http://localhost:3001/api/posts", {
@@ -243,6 +274,8 @@ const DisplayedPost = ({
         getAllPosts().then((posts_json) => setAllPosts(posts_json));
         setShowReplyForm(false);
         setShowReplies(true);
+        setShowRemark(false);
+        setValidReply(false);
       } else {
         console.error("Failed to add reply to the database");
 
@@ -287,17 +320,48 @@ const DisplayedPost = ({
                 </span>
               </div>
             </div>
-            <div className="form-floating mb-3">
-              <textarea
-                className="form-control"
-                placeholder="What's on your mind?"
-                value={isEditing ? editedPostContent : postContent}
-                ref={postRef}
-                onChange={handlePostEditChange}
-                readOnly={!isEditing}
-              ></textarea>
-              <label htmlFor="post">What's on your mind?</label>
-            </div>
+            {Type === "Triggering" && (
+              <div className="form-floating mb-3">
+                <p className="my-0 text-center fw-semibold text-danger">
+                  This post is triggering. Proceed with caution.
+                </p>
+                <p className="mb-3 text-center fw-semibold text-danger">
+                  Trigger warnings: {Remark}
+                </p>
+                <div className="text-center">
+                  {showPostContent ? (
+                    <Button
+                      color="danger"
+                      onClick={hidePostContent}
+                      disabled={false}
+                    >
+                      Hide post
+                    </Button>
+                  ) : (
+                    <Button
+                      color="danger"
+                      onClick={readTriggeringPost}
+                      disabled={false}
+                    >
+                      Proceed reading
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
+            {showPostContent && (
+              <div className="form-floating mb-3">
+                <textarea
+                  className="form-control"
+                  placeholder="What's on your mind?"
+                  value={isEditing ? editedPostContent : postContent}
+                  ref={postRef}
+                  onChange={handlePostEditChange}
+                  readOnly={!isEditing}
+                ></textarea>
+                <label htmlFor="post">What's on your mind?</label>
+              </div>
+            )}
           </>
         ) : State === "MarkedDeleted" ? (
           <p className="my-3 text-center fw-semibold">Deleted</p>
@@ -367,6 +431,11 @@ const DisplayedPost = ({
                 State,
                 post_reply_id,
                 post_reply_level,
+                Type,
+                Privacy,
+                Remark,
+                post_edit_id,
+                isEdited,
               },
               index
             ) =>
@@ -401,9 +470,12 @@ const DisplayedPost = ({
         <Post
           postRef={replyRef}
           onChange={handleReplyChange}
+          onChangeRemark={handleRemarkChange}
           color="primary"
           onClick={handleReplySubmit}
-          disabled={!validReply}
+          disabled={
+            remarkRef.current ? !validReply || !validRemark : !validReply
+          }
           replyMode={true}
           setShowReplyForm={setShowReplyForm}
           postReplyLevel={post_reply_level}
@@ -411,6 +483,7 @@ const DisplayedPost = ({
           setShowRemark={setShowRemark}
           remarkRef={remarkRef}
           privacyRef={privacyRef}
+          setDummyState={setDummyState}
         >
           Confirm Reply
         </Post>

@@ -5,6 +5,7 @@ import Button from "../Button";
 interface PostComponentProps extends ButtonProps {
   postRef: React.RefObject<HTMLTextAreaElement>;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onChangeRemark: (e: React.ChangeEvent<HTMLInputElement>) => void;
   replyMode: boolean;
   setShowReplyForm?: React.Dispatch<React.SetStateAction<boolean>>;
   postReplyLevel: number;
@@ -12,11 +13,13 @@ interface PostComponentProps extends ButtonProps {
   setShowRemark: React.Dispatch<React.SetStateAction<boolean>>;
   remarkRef: React.RefObject<HTMLInputElement>;
   privacyRef: React.RefObject<HTMLSelectElement>;
+  setDummyState: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Post = ({
   postRef,
   onChange,
+  onChangeRemark,
   color,
   onClick,
   disabled,
@@ -27,9 +30,11 @@ const Post = ({
   showRemark,
   setShowRemark,
   remarkRef,
-  privacyRef
+  privacyRef,
+  setDummyState
 }: PostComponentProps) => {
   const replyIndent = postReplyLevel === 0 ? 65 : replyMode ? 115 : 0;
+
 
   const handleReplyCancel = () => {
     if (setShowReplyForm) {
@@ -46,6 +51,8 @@ const Post = ({
     if (showRemark && remarkRef.current) {
       remarkRef.current.focus();
     }
+    setDummyState((prev) => !prev);
+    // console.log(remarkRef.current);
   }, [showRemark]);
 
   const handleTriggeringCancel = () => {
@@ -80,6 +87,7 @@ const Post = ({
               type="text"
               id="remark"
               ref={remarkRef}
+              onChange={onChangeRemark}
               className="form-control"
               placeholder="Include trigger warnings here to let people know (Optional)"
             />
@@ -117,11 +125,7 @@ const Post = ({
           </Button>
         )}
         {replyMode && (
-          <Button
-            color="danger"
-            onClick={handleReplyCancel}
-            disabled={false}
-          >
+          <Button color="danger" onClick={handleReplyCancel} disabled={false}>
             Cancel
           </Button>
         )}
