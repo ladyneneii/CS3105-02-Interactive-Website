@@ -38,6 +38,7 @@ const Post = ({
 
   const handleReplyCancel = () => {
     if (setShowReplyForm) {
+      setShowRemark(false)
       setShowReplyForm(false);
     }
   };
@@ -83,13 +84,14 @@ const Post = ({
         </div>
         {showRemark && (
           <div className="mb-3">
+            <label className="form-label">Trigger Warnings:</label>
             <input
               type="text"
               id="remark"
               ref={remarkRef}
               onChange={onChangeRemark}
               className="form-control"
-              placeholder="Include trigger warnings here to let people know (Optional)"
+              placeholder="e.g. eating disorder, violence, etc."
             />
           </div>
         )}

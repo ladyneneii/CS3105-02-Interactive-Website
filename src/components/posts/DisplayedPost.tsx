@@ -78,6 +78,7 @@ const DisplayedPost = ({
   const [dummyState, setDummyState] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedPostContent, setEditedPostContent] = useState(PostContent);
+  const [validEditedPostContent, setValidEditedPostContent] = useState(false);
   const replyRef = useRef<HTMLTextAreaElement | null>(null);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [validReply, setValidReply] = useState(false);
@@ -87,8 +88,14 @@ const DisplayedPost = ({
 
   const [validRemark, setValidRemark] = useState(false);
   const [showRemark, setShowRemark] = useState(false);
+  const [remarkContent, setRemarkContent] = useState(Remark);
   const remarkRef = useRef<HTMLInputElement | null>(null);
   const privacyRef = useRef<HTMLSelectElement | null>(null);
+
+  const displayedPrivacyRef = useRef<HTMLSelectElement | null>(null);
+  const [validDisplayedRemark, setValidDisplayedRemark] = useState(false);
+  const [showDisplayedRemark, setShowDisplayedRemark] = useState(false);
+  const displayedRemarkRef = useRef<HTMLInputElement | null>(null);
 
   const readTriggeringPost = () => {
     setShowPostContent(true);
@@ -105,6 +112,11 @@ const DisplayedPost = ({
 
   const handleEditPostPending = () => {
     setIsEditing(true);
+    setShowPostContent(true);
+    if (Type === "Triggering") {
+      setShowDisplayedRemark(true);
+      setValidEditedPostContent(postRef.current?.value !== "" ? true : false);
+    }
     // Set focus and move cursor to the end of the text
     postRef.current?.focus();
     postRef.current?.setSelectionRange(
@@ -114,10 +126,51 @@ const DisplayedPost = ({
   };
 
   const handlePostEditChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setEditedPostContent(e.target.value);
+    const newEditedPostContent = e.target.value;
+    setEditedPostContent(newEditedPostContent);
+    setValidEditedPostContent(newEditedPostContent !== "" ? true : false);
+    console.log(displayedRemarkRef.current);
+  };
+
+  const handleDisplayedTriggering = () => {
+    setValidEditedPostContent(postRef.current?.value !== "" ? true : false);
+    setShowDisplayedRemark(true);
+    displayedRemarkRef.current?.focus();
+  };
+
+  useEffect(() => {
+    if (showDisplayedRemark && displayedRemarkRef.current) {
+      displayedRemarkRef.current.focus();
+    }
+    setDummyState((prev) => !prev);
+    // console.log(displayedRemarkRef.current);
+  }, [showDisplayedRemark]);
+
+  const handleDisplayedTriggeringCancel = () => {
+    // empty the value in remark input
+    if (displayedRemarkRef.current) {
+      displayedRemarkRef.current.value = "";
+      setRemarkContent("");
+    }
+    setShowDisplayedRemark(false);
+    postRef.current?.focus();
+  };
+
+  const handleDisplayedRemarkChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newRemarkContent = e.target.value;
+    setValidDisplayedRemark(newRemarkContent.length === 0 ? false : true);
+    setRemarkContent(newRemarkContent);
   };
 
   const handleEditPostCancel = () => {
+    setValidEditedPostContent(false);
+    // only set showPostContent to false upon edit cancel if the post is triggering; otherwise, let it remain true.
+    if (!showPostContent) {
+      setShowPostContent(false);
+    }
+    setShowDisplayedRemark(false);
     setIsEditing(false);
     // preserve the postContent value
     if (postRef.current) {
@@ -131,16 +184,21 @@ const DisplayedPost = ({
   ) => {
     e.preventDefault();
 
-    setIsEditing(false);
     // preserve the editedContent value
     if (postRef.current) {
       postRef.current.value = editedPostContent;
     }
-    setPostContent(editedPostContent);
 
     const formData = new FormData();
     formData.append("post_id", post_id);
     formData.append("Content", editedPostContent);
+    formData.append("date_time", new Date().toISOString());
+    formData.append("Type", showDisplayedRemark ? "Triggering" : "Normal");
+    formData.append(
+      "Privacy",
+      displayedPrivacyRef.current ? displayedPrivacyRef.current.value : "n/a"
+    );
+    formData.append("Remark", showDisplayedRemark ? remarkContent : "");
 
     // update post content on the database
     try {
@@ -151,6 +209,11 @@ const DisplayedPost = ({
 
       if (response.ok) {
         console.log("Successfully updated post on the database.");
+        getAllPosts().then((posts_json) => setAllPosts(posts_json));
+        setValidEditedPostContent(false);
+        setIsEditing(false);
+        setPostContent(editedPostContent);
+        setShowDisplayedRemark(false);
       } else {
         console.error("Failed to update post on the database");
 
@@ -333,7 +396,7 @@ const DisplayedPost = ({
                     <Button
                       color="danger"
                       onClick={hidePostContent}
-                      disabled={false}
+                      disabled={!isEditing ? false : true}
                     >
                       Hide post
                     </Button>
@@ -362,6 +425,38 @@ const DisplayedPost = ({
                 <label htmlFor="post">What's on your mind?</label>
               </div>
             )}
+            {showDisplayedRemark && (
+              <div className="mb-3">
+                <label className="form-label">Trigger Warnings:</label>
+                <input
+                  type="text"
+                  id="remark"
+                  value={remarkContent}
+                  ref={displayedRemarkRef}
+                  onChange={handleDisplayedRemarkChange}
+                  className="form-control"
+                  placeholder="e.g. eating disorder, violence, etc."
+                  readOnly={isEditing ? false : true}
+                />
+              </div>
+            )}
+            {isEditing && (
+              <div className="mb-3">
+                <label className="form-label">Privacy</label>
+                <select
+                  className="form-select"
+                  id="privacy"
+                  ref={displayedPrivacyRef}
+                  defaultValue="Everyone"
+                  style={{ width: "15%" }}
+                >
+                  <option value="Everyone">Everyone</option>
+                  <option value="MHP">MHP</option>
+                  <option value="Followers">Followers</option>
+                  <option value="Friends">Friends</option>
+                </select>
+              </div>
+            )}
           </>
         ) : State === "MarkedDeleted" ? (
           <p className="my-3 text-center fw-semibold">Deleted</p>
@@ -386,7 +481,11 @@ const DisplayedPost = ({
                 View Replies
               </Button>
             ) : (
-              <Button color="primary" onClick={handlePostHideReplies}>
+              <Button
+                color="primary"
+                onClick={handlePostHideReplies}
+                disabled={isEditing ? true : false}
+              >
                 Hide Replies
               </Button>
             ))}
@@ -408,9 +507,34 @@ const DisplayedPost = ({
                 </>
               ) : (
                 <>
-                  <Button color="primary" onClick={handleEditPostConfirm}>
+                  <Button
+                    color="primary"
+                    onClick={handleEditPostConfirm}
+                    disabled={
+                      displayedRemarkRef.current
+                        ? !validEditedPostContent || !validDisplayedRemark
+                        : !validEditedPostContent
+                    }
+                  >
                     Confirm Edit
                   </Button>
+                  {!showDisplayedRemark ? (
+                    <Button
+                      color="primary"
+                      onClick={handleDisplayedTriggering}
+                      disabled={false}
+                    >
+                      Mark this as triggering
+                    </Button>
+                  ) : (
+                    <Button
+                      color="primary"
+                      onClick={handleDisplayedTriggeringCancel}
+                      disabled={false}
+                    >
+                      Unmark as triggering
+                    </Button>
+                  )}
                   <Button color="danger" onClick={handleEditPostCancel}>
                     Cancel
                   </Button>
