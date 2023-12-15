@@ -5,6 +5,7 @@ import MHPFormPage from "./pages/MHPFormPage";
 import MainPage from "./pages/MainPage";
 import PostsPage from "./pages/PostsPage";
 import MessagesPage from "./pages/MessagesPage";
+import TheWorldPage from "./pages/TheWorldPage";
 import io from "socket.io-client";
 
 const socket = io("http://localhost:3001");
@@ -20,6 +21,7 @@ const App = () => {
           <Route path="/MainPage" element={<MainPage />} />
           <Route path="/PostsPage" element={<PostsPage />} />
           <Route path="/MessagesPage" element={<MessagesPage />} />
+          <Route path="/TheWorldPage" element={<TheWorldPage />} />
         </Routes>
       </Router>
     </main>

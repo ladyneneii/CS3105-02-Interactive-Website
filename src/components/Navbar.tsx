@@ -1,9 +1,23 @@
+import { useEffect, useRef } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { Link } from "react-router-dom";
 
-const Navbar = () => {
+interface NavbarComponentProps {
+  handleNavbarHeightChange?: (height: number) => void;
+}
+
+const Navbar = ({ handleNavbarHeightChange }: NavbarComponentProps) => {
+  const navbarRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const navbarHeight = navbarRef.current ? navbarRef.current.clientHeight : 0;
+    if (handleNavbarHeightChange){
+      handleNavbarHeightChange(navbarHeight);
+    }
+  }, [handleNavbarHeightChange]);
+  
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary">
+    <nav ref={navbarRef} className="navbar navbar-expand-lg bg-body-tertiary">
       <div className="container-fluid">
         <a className="navbar-brand" href="#">
           Padayon
@@ -22,7 +36,11 @@ const Navbar = () => {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <Link  to="/MainPage" className="nav-link active" aria-current="page">
+              <Link
+                to="/MainPage"
+                className="nav-link active"
+                aria-current="page"
+              >
                 Home
               </Link>
             </li>
@@ -70,6 +88,11 @@ const Navbar = () => {
             <li className="nav-item">
               <Link to="/MessagesPage" className="nav-link">
                 Messages
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/TheWorldPage" className="nav-link">
+                The World
               </Link>
             </li>
           </ul>

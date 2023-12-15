@@ -322,7 +322,7 @@ const DisplayedPost = ({
     );
     formData.append(
       "Remark",
-      remarkRef.current ? remarkRef.current.value : "n/a"
+      remarkRef.current ? remarkRef.current.value : ""
     );
 
     try {
