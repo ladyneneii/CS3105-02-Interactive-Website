@@ -14,12 +14,12 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, storage } from "../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
-interface UserProps {
+export interface UserProps {
   user_id: string;
   Username: string;
   Email: string;
   Password: string;
-  avatar_url: File;
+  avatar_url: File | string;
   Role: "admin" | "mhp" | "nmhp";
   register_date: string;
   State: "Active" | "Pending" | "Blocked" | "Unverified";

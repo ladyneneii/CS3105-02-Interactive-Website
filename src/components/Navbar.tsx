@@ -47,6 +47,7 @@ const Navbar = ({ handleNavbarHeightChange }: NavbarComponentProps) => {
             <li className="nav-item">
               <Link to="/SignIn" className="nav-link">
                 Log Out
+                {/* TODO: erase user info from localstorage */}
               </Link>
             </li>
             <li className="nav-item dropdown">

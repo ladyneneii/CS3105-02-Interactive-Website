@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import io from "socket.io-client";
+import Navbar from "../components/Navbar";
 import Chat from "../components/Chat";
 import "../styles/pages/style.css";
 
@@ -85,35 +86,38 @@ const MessagesPage = () => {
   };
 
   return (
-    <div className="MessagesPage">
-      {!showChat ? (
-        <div className="joinChatContainer">
-          <h3>Join a chat</h3>
-          <input
-            type="text"
-            placeholder="Room Title..."
-            onChange={(e) => {
-              setRoom(e.target.value);
-            }}
+    <>
+      <Navbar></Navbar>
+      <div className="MessagesPage">
+        {!showChat ? (
+          <div className="joinChatContainer">
+            <h3>Join a chat</h3>
+            <input
+              type="text"
+              placeholder="Room Title..."
+              onChange={(e) => {
+                setRoom(e.target.value);
+              }}
+            />
+            <input
+              type="password"
+              placeholder="Password..."
+              onChange={(e) => {
+                setPwd(e.target.value);
+              }}
+            />
+            <button onClick={joinRoom}>Join a room</button>
+          </div>
+        ) : (
+          <Chat
+            socket={socket}
+            username={username}
+            room={room}
+            room_id={roomObject?.room_id}
           />
-          <input
-            type="password"
-            placeholder="Password..."
-            onChange={(e) => {
-              setPwd(e.target.value);
-            }}
-          />
-          <button onClick={joinRoom}>Join a room</button>
-        </div>
-      ) : (
-        <Chat
-          socket={socket}
-          username={username}
-          room={room}
-          room_id={roomObject?.room_id}
-        />
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 
