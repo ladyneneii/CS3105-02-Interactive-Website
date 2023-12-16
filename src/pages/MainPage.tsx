@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Alert from "../components/Alert";
-import { UserProps } from "./Register";
+import Card from "../components/Card";
 
 interface MHPSummarizedInfoProps {
   Username: string;
@@ -24,6 +24,7 @@ interface MHPSummarizedInfoProps {
   Address: string;
   Latitude: string;
   Longitude: string;
+  DistanceAway: { metersAway: number; kilometersAway: number };
 }
 
 const MainPage = () => {
@@ -144,7 +145,7 @@ const MainPage = () => {
         (error) => {
           // Error handling, including permission denial
           setError(`Error getting geolocation: ${error.message}`);
-          fetchAllMHPs(); 
+          fetchAllMHPs();
         }
       );
     } else {
@@ -156,6 +157,36 @@ const MainPage = () => {
     <>
       <Navbar></Navbar>
       {error && <Alert color="danger">{error}</Alert>}
+      <div className="container text-center mt-2">
+        <h1 className="text-center mb-4">
+          Mental Health Professionals Near Me
+        </h1>
+        <div className="row">
+          {allMhps.map(
+            ({
+              Username,
+              avatar_url,
+              first_name,
+              middle_name,
+              last_name,
+              DistanceAway,
+              disorders_specializations,
+            }) => (
+              <div key={Username} className="col">
+                <Card
+                  Username={Username}
+                  avatar_url={avatar_url}
+                  first_name={first_name}
+                  middle_name={middle_name}
+                  last_name={last_name}
+                  DistanceAway={DistanceAway}
+                  disorders_specializations={disorders_specializations}
+                ></Card>
+              </div>
+            )
+          )}
+        </div>
+      </div>
     </>
   );
 };
