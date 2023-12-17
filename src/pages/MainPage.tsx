@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import "firebase/storage";
 import Navbar from "../components/Navbar";
 import Alert from "../components/Alert";
 import Card from "../components/Card";
@@ -34,6 +35,7 @@ const MainPage = () => {
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [allMhps, setAllMhps] = useState<MHPSummarizedInfoProps[]>([]);
+
   useEffect(() => {
     const fetchAllMHPs = async () => {
       try {
