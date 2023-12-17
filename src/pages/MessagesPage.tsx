@@ -40,6 +40,8 @@ const MessagesPage = () => {
 
   useEffect(() => {
     if (roomObject) {
+      console.log("blasjdfklsd");
+      console.log(roomObject.room_id);
       setShowChat(true);
     } else {
       if (roomRef.current) {
@@ -72,20 +74,20 @@ const MessagesPage = () => {
           body: formData,
         });
 
-        console.log(username, room, pwd);
-        console.log(formData.get("Title"));
-        console.log(formData.get("Password"));
-        console.log(formData.get("Members"));
-        console.log(formData.get("State"));
+        // console.log(username, room, pwd);
+        // console.log(formData.get("Title"));
+        // console.log(formData.get("Password"));
+        // console.log(formData.get("Members"));
+        // console.log(formData.get("State"));
 
         if (response.ok) {
-          console.log("Room added successfully!");
           const [room_object] = await response.json();
           console.log(room_object);
           console.log("This is room_id: ", room_object.room_id);
 
           socket.emit("join_room", room_object.room_id);
           setRoomObject(room_object);
+          setShowChat(false);
         } else {
           console.error(
             "Failed to add room to the database or fetch room from the database."

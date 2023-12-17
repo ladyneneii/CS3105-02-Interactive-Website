@@ -12,7 +12,12 @@ import Button from "../components/Button";
 import { Link } from "react-router-dom";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, storage } from "../firebase";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import {
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+  getStorage,
+} from "firebase/storage";
 
 export interface UserProps {
   user_id: string;
@@ -29,6 +34,7 @@ export interface UserProps {
   Age: string;
   Gender: string;
   Pronouns: string;
+  firebase_avatar_url: string;
 }
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
@@ -37,6 +43,7 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%_=+]).{8,24}$/;
 
 const Register = () => {
   const navigate = useNavigate();
+  const [avatarUrl, setAvatarUrl] = useState("");
 
   const firstNameRef = useRef<HTMLInputElement | null>(null);
   const errRef = useRef<HTMLDivElement | null>(null);
@@ -149,30 +156,6 @@ const Register = () => {
       return;
     }
 
-    const formData = new FormData();
-    const register_date = new Date()
-      .toISOString()
-      .slice(0, 19)
-      .replace("T", " ");
-    const state =
-      selectedUserType === "mhp" && notVerifiedProfessional
-        ? "Unverified"
-        : "Active";
-
-    formData.append("Username", user);
-    formData.append("Email", email);
-    formData.append("Password", pwd);
-    formData.append("avatar_url", file);
-    formData.append("Role", selectedUserType);
-    formData.append("register_date", register_date);
-    formData.append("State", state);
-    formData.append("first_name", firstName);
-    formData.append("middle_name", middleName || "n/a");
-    formData.append("last_name", lastName);
-    formData.append("Age", age);
-    formData.append("Gender", gender || "n/a");
-    formData.append("Pronouns", pronouns || "n/a");
-
     // Make a request here to /api/users to get the record with the inputted user (if it exists)
     try {
       const response = await fetch(
@@ -211,51 +194,6 @@ const Register = () => {
     } catch (error) {
       console.error("Error during GET request:", error);
       setErrMsg("Error during GET request:");
-
-      return;
-    }
-
-    // add data to database
-    try {
-      // Make a POST request to server endpoint
-      const response = await fetch("http://localhost:3001/api/users", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        const user_id = await response.json();
-        console.log(`Inserted id: ${user_id}`);
-
-        // for localStorage
-        const user_details: UserProps = {
-          user_id,
-          Username: user,
-          Email: email,
-          Password: pwd,
-          avatar_url: file,
-          Role: selectedUserType as "admin" | "mhp" | "nmhp",
-          register_date,
-          State: state,
-          first_name: firstName,
-          middle_name: middleName || "n/a",
-          last_name: lastName,
-          Age: age,
-          Gender: gender || "n/a",
-          Pronouns: pronouns || "n/a",
-        };
-
-        // add to localStorage
-        localStorage.setItem("user_details", JSON.stringify(user_details));
-      } else {
-        console.error("Failed to add user to the database");
-        setErrMsg("Failed to add user to the database");
-
-        return;
-      }
-    } catch (error) {
-      console.error("Error during POST request:", error);
-      setErrMsg("Error during POST request:");
 
       return;
     }
@@ -303,6 +241,105 @@ const Register = () => {
       setSuccess(true);
     } catch (err) {
       setErrMsg("Something went wrong. Try again.");
+    }
+
+    try {
+      const storage = getStorage();
+      const avatarRef = ref(storage, user);
+
+      getDownloadURL(avatarRef)
+        .then((url) => {
+          setAvatarUrl(url);
+        })
+        .catch((error) => {
+          switch (error.code) {
+            case "storage/object-not-found":
+              // File doesn't exist
+              break;
+            case "storage/unauthorized":
+              // User doesn't have permission to access the object
+              break;
+            case "storage/canceled":
+              // User canceled the upload
+              break;
+            case "storage/unknown":
+              // Unknown error occurred, inspect the server response
+              break;
+          }
+        });
+    } catch (err) {
+      setErrMsg("Something went wrong. Try again.");
+    }
+
+    const formData = new FormData();
+    const register_date = new Date()
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+    const state =
+      selectedUserType === "mhp" && notVerifiedProfessional
+        ? "Unverified"
+        : "Active";
+
+    formData.append("Username", user);
+    formData.append("Email", email);
+    formData.append("Password", pwd);
+    formData.append("avatar_url", file);
+    formData.append("Role", selectedUserType);
+    formData.append("register_date", register_date);
+    formData.append("State", state);
+    formData.append("first_name", firstName);
+    formData.append("middle_name", middleName || "n/a");
+    formData.append("last_name", lastName);
+    formData.append("Age", age);
+    formData.append("Gender", gender || "n/a");
+    formData.append("Pronouns", pronouns || "n/a");
+    formData.append("firebase_avatar_url", avatarUrl || "n/a");
+
+    // add data to database
+    try {
+      // Make a POST request to server endpoint
+      const response = await fetch("http://localhost:3001/api/users", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const user_id = await response.json();
+        console.log(`Inserted id: ${user_id}`);
+
+        // for localStorage
+        const user_details: UserProps = {
+          user_id,
+          Username: user,
+          Email: email,
+          Password: pwd,
+          avatar_url: file,
+          Role: selectedUserType as "admin" | "mhp" | "nmhp",
+          register_date,
+          State: state,
+          first_name: firstName,
+          middle_name: middleName || "n/a",
+          last_name: lastName,
+          Age: age,
+          Gender: gender || "n/a",
+          Pronouns: pronouns || "n/a",
+          firebase_avatar_url: avatarUrl || "n/a",
+        };
+
+        // add to localStorage
+        localStorage.setItem("user_details", JSON.stringify(user_details));
+      } else {
+        console.error("Failed to add user to the database");
+        setErrMsg("Failed to add user to the database");
+
+        return;
+      }
+    } catch (error) {
+      console.error("Error during POST request:", error);
+      setErrMsg("Error during POST request:");
+
+      return;
     }
   };
 

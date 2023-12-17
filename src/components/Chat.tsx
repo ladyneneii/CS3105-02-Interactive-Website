@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import ScrollToBottom from "react-scroll-to-bottom";
-import Button from "./Button";
+import empty_pfp from "../assets/img/empty-profile-picture-612x612.jpg";
+import "../styles/components/post.css";
 
 interface ChatProps {
   socket: any;
@@ -17,11 +19,13 @@ interface MessageProps {
   date_time: string;
   message_reply_id: number | null;
   message_reply_username: string | null;
+  firebase_avatar_url?: string;
 }
 
 const Chat = ({ socket, username, room, room_id }: ChatProps) => {
   const [currentMessage, setCurrentMessage] = useState("");
   const [messageList, setMessageList] = useState<MessageProps[]>([]);
+  let avatarUrl: string = "";
 
   // retrieve all messages in room_id from the database
   useEffect(() => {
@@ -105,13 +109,26 @@ const Chat = ({ socket, username, room, room_id }: ChatProps) => {
       <div className="chat-body">
         <ScrollToBottom className="message-container">
           {messageList.map((messageContent: MessageProps, index) => {
-            const { Username, Content, date_time } = messageContent;
+            const { Username, Content, date_time, firebase_avatar_url } =
+              messageContent;
+
             return (
               <div
                 className="message"
                 id={username === Username ? "you" : "other"}
                 key={index}
               >
+                {username !== Username && (
+                  <img
+                    src={
+                      firebase_avatar_url === "n/a"
+                        ? empty_pfp
+                        : firebase_avatar_url
+                    }
+                    alt="profile picture"
+                    className="rounded-circle empty_profile_picture_icon me-3"
+                  />
+                )}
                 <div className="very-flex-end">
                   <div className="message-content">
                     <p>{Content}</p>
@@ -140,7 +157,7 @@ const Chat = ({ socket, username, room, room_id }: ChatProps) => {
             e.key === "Enter" && sendMessage();
           }}
         />
-        <button className="btn btn-primary" onClick={sendMessage}>
+        <button className="btn btn-primary me-2" onClick={sendMessage}>
           Send
         </button>
       </div>

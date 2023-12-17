@@ -3,6 +3,7 @@ import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import empty_pfp from "../assets/img/empty-profile-picture-612x612.jpg";
 import Navbar from "../components/Navbar";
 import { useParams } from "react-router-dom";
+import Button from "../components/Button";
 
 interface MHPFullInfoProps {
   Username: string;
@@ -108,10 +109,16 @@ const ProfilePage = () => {
     }
   }, []);
 
+  const handleMessage = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    
+  };
+
   return (
     <>
       <Navbar />
-      <div className="container mt-3">
+      <div className="container mt-3 p-3">
         {userDetails ? (
           // Destructure userDetails outside JSX
           (() => {
@@ -170,10 +177,6 @@ const ProfilePage = () => {
                 .join(", ");
             }
 
-            console.log(feesWithPeso);
-
-            console.log(feesWithPeso);
-
             return (
               <div className="row">
                 <div className="col">
@@ -182,8 +185,8 @@ const ProfilePage = () => {
                     alt="User avatar"
                     className="border rounded-circle"
                     style={{
-                      width: "300px",
-                      height: "300px",
+                      width: "250px",
+                      height: "250px",
                       objectFit: "cover",
                     }}
                   />
@@ -208,12 +211,13 @@ const ProfilePage = () => {
                       {DistanceAway.kilometersAway} km away from you.
                     </h6>
                   )}
+                  <Button color="primary" onClick={handleMessage}>Message</Button>
                 </div>
                 <div className="col">
                   {Role === "mhp" && (
                     <>
                       <div className="mt-2">
-                        <h4>Disorders Specializations:</h4>
+                        <h5>Disorders Specializations:</h5>
                         <div className="d-flex flex-column align-items-start">
                           {disorders_specializations_arr.map(
                             (disorders_specialization, index) => (
@@ -225,33 +229,33 @@ const ProfilePage = () => {
                         </div>
                       </div>
                       <div className="mt-2">
-                        <h4>Years of Experience:</h4>
+                        <h5>Years of Experience:</h5>
                         <p className="my-0 ms-4">{years_of_experience} years</p>
                       </div>
                       <div className="mt-2">
-                        <h4>Spoken Languages:</h4>
+                        <h5>Spoken Languages:</h5>
                         <p className="my-0 ms-4">{Languages}</p>
                       </div>
                       <div className="mt-2">
-                        <h4>Available Days:</h4>
+                        <h5>Available Days:</h5>
                         <p className="my-0 ms-4">{availableDays}</p>
                       </div>
                       <div className="mt-2">
-                        <h4>Available Hours:</h4>
+                        <h5>Available Hours:</h5>
                         <p className="my-0 ms-4">{available_hours}</p>
                       </div>
                       <div className="mt-2">
-                        <h4>Fees:</h4>
+                        <h5>Fees:</h5>
                         <p className="my-0 ms-4">{feesWithPeso}</p>
                       </div>
                       <div className="mt-2">
-                        <h4>Address:</h4>
+                        <h5>Address:</h5>
                         <p className="my-0 ms-4">
                           {Address === "n/a" ? "Not indicated." : Address}
                         </p>
                       </div>
                       <div className="mt-2">
-                        <h4>Notes:</h4>
+                        <h5>Notes:</h5>
                         <p className="my-0 ms-4">{Notes}</p>
                       </div>
                     </>
