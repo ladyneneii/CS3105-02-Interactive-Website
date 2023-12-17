@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import ScrollToBottom from "react-scroll-to-bottom";
+import Button from "./Button";
 
 interface ChatProps {
   socket: any;
@@ -99,7 +100,7 @@ const Chat = ({ socket, username, room, room_id }: ChatProps) => {
   return (
     <div className="chat-window">
       <div className="chat-header">
-        <p>{room}</p>
+        <h4>{room}</h4>
       </div>
       <div className="chat-body">
         <ScrollToBottom className="message-container">
@@ -111,7 +112,7 @@ const Chat = ({ socket, username, room, room_id }: ChatProps) => {
                 id={username === Username ? "you" : "other"}
                 key={index}
               >
-                <div>
+                <div className="very-flex-end">
                   <div className="message-content">
                     <p>{Content}</p>
                   </div>
@@ -139,7 +140,9 @@ const Chat = ({ socket, username, room, room_id }: ChatProps) => {
             e.key === "Enter" && sendMessage();
           }}
         />
-        <button onClick={sendMessage}>&#9658;</button>
+        <button className="btn btn-primary" onClick={sendMessage}>
+          Send
+        </button>
       </div>
     </div>
   );

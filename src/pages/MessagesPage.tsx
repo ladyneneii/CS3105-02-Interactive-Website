@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import Navbar from "../components/Navbar";
 import Chat from "../components/Chat";
 import "../styles/pages/style.css";
+import Button from "../components/Button";
 
 const socket = io("http://localhost:3001");
 
@@ -16,21 +17,39 @@ interface RoomProps {
 
 const MessagesPage = () => {
   // const [username, setUsername] = useState("");
+  const roomRef = useRef<HTMLInputElement | null>(null);
   const [room, setRoom] = useState("");
   const [pwd, setPwd] = useState("");
+  const [validRoom, setValidRoom] = useState(false);
+  const [validPwd, setValidPwd] = useState(false);
   const [showChat, setShowChat] = useState(false);
-  const [roomObject, setRoomObject] = useState<RoomProps | undefined>()
-  let username: string | null = null;
+  const [roomObject, setRoomObject] = useState<RoomProps | undefined>();
   const unparsed_user_details = localStorage.getItem("user_details");
+
+  const handleRoomChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newRoom = e.target.value;
+    setValidRoom(newRoom.length === 0 ? false : true);
+    setRoom(newRoom)
+  };
+
+  const handlePwdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPwd = e.target.value;
+    setValidPwd(newPwd.length === 0 ? false : true);
+    setPwd(newPwd)
+  };
 
   useEffect(() => {
     if (roomObject) {
       setShowChat(true);
     } else {
+      if (roomRef.current) {
+        roomRef.current.focus();
+      }
       console.error("Failed to retrieve room_object json.");
     }
   }, [roomObject]);
 
+  let username: string | null = null;
   if (unparsed_user_details) {
     username = JSON.parse(unparsed_user_details)?.Username;
   } else {
@@ -88,34 +107,56 @@ const MessagesPage = () => {
   return (
     <>
       <Navbar></Navbar>
-      <div className="MessagesPage">
-        {!showChat ? (
-          <div className="joinChatContainer">
-            <h3>Join a chat</h3>
-            <input
-              type="text"
-              placeholder="Room Title..."
-              onChange={(e) => {
-                setRoom(e.target.value);
-              }}
-            />
-            <input
-              type="password"
-              placeholder="Password..."
-              onChange={(e) => {
-                setPwd(e.target.value);
-              }}
-            />
-            <button onClick={joinRoom}>Join a room</button>
+      <div className="container-xxl">
+        <div className="row">
+          <div className="col">
+            <div className="row">
+              <h3>Join a chatroom</h3>
+            </div>
+
+            <div className="row">
+              <div className="col">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Room Title..."
+                  ref={roomRef}
+                  onChange={handleRoomChange}
+                />
+              </div>
+
+              <div className="col">
+                <input
+                  type="password"
+                  className="form-control"
+                  placeholder="Password..."
+                  onChange={handlePwdChange}
+                />
+              </div>
+
+              <div className="col">
+                <Button
+                  color="primary"
+                  onClick={joinRoom}
+                  disabled={!validRoom || !validPwd}
+                >
+                  Join
+                </Button>
+              </div>
+            </div>
           </div>
-        ) : (
-          <Chat
-            socket={socket}
-            username={username}
-            room={room}
-            room_id={roomObject?.room_id}
-          />
-        )}
+
+          <div className="col">
+            {showChat && (
+              <Chat
+                socket={socket}
+                username={username}
+                room={room}
+                room_id={roomObject?.room_id}
+              />
+            )}
+          </div>
+        </div>
       </div>
     </>
   );

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import empty_pfp from "../../assets/img/empty-profile-picture-612x612.jpg";
 import "../../styles/components/post.css";
 import Button from "../Button";
@@ -44,6 +45,7 @@ const DisplayedPost = ({
   setAllPosts,
   currentPostReplies,
 }: DisplayedPostComponentProps) => {
+  const [avatarUrl, setAvatarUrl] = useState("");
   const user_details_str = localStorage.getItem("user_details");
   let logged_in_user_id = "-1";
   let logged_in_username = "";
@@ -96,6 +98,33 @@ const DisplayedPost = ({
   const [validDisplayedRemark, setValidDisplayedRemark] = useState(false);
   const [showDisplayedRemark, setShowDisplayedRemark] = useState(false);
   const displayedRemarkRef = useRef<HTMLInputElement | null>(null);
+
+  // Retrieve the profile picture
+  useEffect(() => {
+    const storage = getStorage();
+    const avatarRef = ref(storage, Username);
+
+    getDownloadURL(avatarRef)
+      .then((url) => {
+        setAvatarUrl(url);
+      })
+      .catch((error) => {
+        switch (error.code) {
+          case "storage/object-not-found":
+            // File doesn't exist
+            break;
+          case "storage/unauthorized":
+            // User doesn't have permission to access the object
+            break;
+          case "storage/canceled":
+            // User canceled the upload
+            break;
+          case "storage/unknown":
+            // Unknown error occurred, inspect the server response
+            break;
+        }
+      });
+  });
 
   const readTriggeringPost = () => {
     setShowPostContent(true);
@@ -320,10 +349,7 @@ const DisplayedPost = ({
       "Privacy",
       privacyRef.current ? privacyRef.current.value : "n/a"
     );
-    formData.append(
-      "Remark",
-      remarkRef.current ? remarkRef.current.value : ""
-    );
+    formData.append("Remark", remarkRef.current ? remarkRef.current.value : "");
 
     try {
       const response = await fetch("http://localhost:3001/api/posts", {
@@ -372,9 +398,9 @@ const DisplayedPost = ({
           <>
             <div className="user_details my-2">
               <img
-                src={empty_pfp}
+                src={avatarUrl || empty_pfp}
                 alt="empty profile picture"
-                className="rounded-circle empty_profile_picture_icon"
+                className="rounded-circle empty_profile_picture_icon me-3"
               />
               <div className="username_date-time">
                 <p className="my-0 fw-semibold">{Username}</p>
