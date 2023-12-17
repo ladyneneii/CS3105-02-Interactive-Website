@@ -26,6 +26,7 @@ const App = () => {
           <Route path="/SignIn" element={<SignIn />} />
           <Route path="/MHPFormPage" element={<MHPFormPage />} />
           <Route path="/MainPage" element={<MainPage />} />
+          <Route path="/ProfilePage" element={<ProfilePage />} />
           <Route
             path="/ProfilePage/:user"
             element={<ProfilePage/>}

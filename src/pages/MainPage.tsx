@@ -4,27 +4,13 @@ import Navbar from "../components/Navbar";
 import Alert from "../components/Alert";
 import Card from "../components/Card";
 
-interface MHPSummarizedInfoProps {
+interface MHPCardDisplayInfoProps {
   Username: string;
   avatar_url: string;
   first_name: string;
   middle_name: string;
   last_name: string;
-  Age: number;
-  Gender: string;
-  Pronouns: string;
   disorders_specializations: string;
-  Fees: string;
-  years_of_experience: number;
-  Languages: string;
-  min_age: number;
-  max_age: string;
-  Notes: string;
-  available_days: string;
-  available_hours: string;
-  Address: string;
-  Latitude: string;
-  Longitude: string;
   DistanceAway: { metersAway: number; kilometersAway: number };
 }
 
@@ -34,7 +20,7 @@ const MainPage = () => {
     longitude: number;
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [allMhps, setAllMhps] = useState<MHPSummarizedInfoProps[]>([]);
+  const [allMhps, setAllMhps] = useState<MHPCardDisplayInfoProps[]>([]);
 
   useEffect(() => {
     const fetchAllMHPs = async () => {

@@ -23,13 +23,7 @@ const Card = ({
   DistanceAway,
   disorders_specializations,
 }: CardComponentProps) => {
-  const modifiedString: string = disorders_specializations.replace(
-    /-|(and)|(\b\w)/g,
-    (match, and, letter) => (and ? "and" : letter ? letter.toUpperCase() : " ")
-  );
-  const disorders_specializations_arr: string[] = modifiedString.split(", ");
-
-  const [avatarUrl, setAvatarUrl] = useState("")
+  const [avatarUrl, setAvatarUrl] = useState("");
 
   useEffect(() => {
     // Create a reference to the file we want to download
@@ -39,7 +33,7 @@ const Card = ({
     // Get the download URL
     getDownloadURL(avatarRef)
       .then((url) => {
-        setAvatarUrl(url)
+        setAvatarUrl(url);
       })
       .catch((error) => {
         switch (error.code) {
@@ -76,16 +70,6 @@ const Card = ({
             {first_name} {middle_name === "n/a" ? "" : middle_name} {last_name}{" "}
             <span className="text-body-tertiary">({Username})</span>
           </h5>
-
-          {/* <div className="d-flex flex-column align-items-start">
-              {disorders_specializations_arr.map(
-                (disorders_specialization, index) => (
-                  <p key={index} className="card-text my-0">
-                    {disorders_specialization}
-                  </p>
-                )
-              )}
-            </div> */}
 
           <p className="card-text my-0">
             {DistanceAway ? DistanceAway.metersAway : "n/a"} m away
