@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import io from "socket.io-client";
 import empty_pfp from "../assets/img/empty-profile-picture-612x612.jpg";
 import Navbar from "../components/Navbar";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
+
+const socket = io("http://localhost:3001");
 
 interface MHPFullInfoProps {
   Username: string;
@@ -31,24 +34,24 @@ interface MHPFullInfoProps {
 }
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
   const { user } = useParams<{ user?: string }>();
   const [userDetails, setUserDetails] = useState<MHPFullInfoProps | null>(null);
+  const [loggedInUsername, setLoggedInUsername] = useState("")
 
   let username = "";
+  let logged_in_username = ""
   const [avatarUrl, setAvatarUrl] = useState("");
 
   useEffect(() => {
-    if (!user) {
-      const user_details_str = localStorage.getItem("user_details");
-
-      if (user_details_str) {
-        username = JSON.parse(user_details_str).Username;
-      } else {
-        console.error("user details not found in the local storage.");
-      }
+    const user_details_str = localStorage.getItem("user_details");
+    
+    if (user_details_str) {
+      logged_in_username = JSON.parse(user_details_str).Username;
     } else {
-      username = user;
+      console.error("user details not found in the local storage.");
     }
+    username = !user ? logged_in_username : user;
 
     const storage = getStorage();
     const avatarRef = ref(storage, username);
@@ -56,6 +59,7 @@ const ProfilePage = () => {
     getDownloadURL(avatarRef)
       .then((url) => {
         setAvatarUrl(url);
+        setLoggedInUsername(logged_in_username)
       })
       .catch((error) => {
         switch (error.code) {
@@ -87,7 +91,6 @@ const ProfilePage = () => {
 
               if (response.ok) {
                 const user_details_json = await response.json();
-                console.log(user_details_json);
                 setUserDetails(user_details_json);
               } else {
                 console.error("Failed to retrieve user");
@@ -109,10 +112,40 @@ const ProfilePage = () => {
     }
   }, []);
 
-  const handleMessage = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleMessage = async (e: React.MouseEvent<HTMLButtonElement>, Username: string) => {
     e.preventDefault();
 
-    
+    try {
+      const formData = new FormData();
+
+      formData.append("Member1", loggedInUsername);
+      formData.append("Member2", Username);
+      formData.append("Title", `${loggedInUsername}, ${Username}`);
+      formData.append("State", "Active");
+
+      const response = await fetch("http://localhost:3001/api/private_rooms", {
+        method: "PUT",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const private_room_id = await response.json();
+        console.log(private_room_id);
+ 
+        navigate("/MessagesPage")
+      } else {
+        console.error(
+          "Failed to add private room to the database or fetch private room from the database."
+        );
+        console.log(response);
+
+        return;
+      }
+    } catch (error) {
+      console.error("Error during PUT request:", error);
+
+      return;
+    }
   };
 
   return (
@@ -211,7 +244,11 @@ const ProfilePage = () => {
                       {DistanceAway.kilometersAway} km away from you.
                     </h6>
                   )}
-                  <Button color="primary" onClick={handleMessage}>Message</Button>
+                  {Username != loggedInUsername && (
+                    <Button color="primary" onClick={(e) => handleMessage(e, Username)}>
+                      Message
+                    </Button>
+                  )}
                 </div>
                 <div className="col">
                   {Role === "mhp" && (

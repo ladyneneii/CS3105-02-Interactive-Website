@@ -102,7 +102,7 @@ const MessagesPage = () => {
         return;
       }
     } else {
-      console.log("ERROR");
+      console.log("Please fill in the form.");
     }
   };
 
