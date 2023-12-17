@@ -9,6 +9,7 @@ import Button from "../components/Button";
 const socket = io("http://localhost:3001");
 
 interface MHPFullInfoProps {
+  user_id: string;
   Username: string;
   avatar_url: string;
   first_name: string;
@@ -37,16 +38,19 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const { user } = useParams<{ user?: string }>();
   const [userDetails, setUserDetails] = useState<MHPFullInfoProps | null>(null);
-  const [loggedInUsername, setLoggedInUsername] = useState("")
+  const [loggedInUserId, setLoggedInUserId] = useState("");
+  const [loggedInUsername, setLoggedInUsername] = useState("");
 
   let username = "";
-  let logged_in_username = ""
+  let logged_in_user_id = "";
+  let logged_in_username = "";
   const [avatarUrl, setAvatarUrl] = useState("");
 
   useEffect(() => {
     const user_details_str = localStorage.getItem("user_details");
-    
+
     if (user_details_str) {
+      logged_in_user_id = JSON.parse(user_details_str).user_id;
       logged_in_username = JSON.parse(user_details_str).Username;
     } else {
       console.error("user details not found in the local storage.");
@@ -59,7 +63,8 @@ const ProfilePage = () => {
     getDownloadURL(avatarRef)
       .then((url) => {
         setAvatarUrl(url);
-        setLoggedInUsername(logged_in_username)
+        setLoggedInUserId(logged_in_user_id);
+        setLoggedInUsername(logged_in_username);
       })
       .catch((error) => {
         switch (error.code) {
@@ -112,7 +117,11 @@ const ProfilePage = () => {
     }
   }, []);
 
-  const handleMessage = async (e: React.MouseEvent<HTMLButtonElement>, Username: string) => {
+  const handleMessage = async (
+    e: React.MouseEvent<HTMLButtonElement>,
+    user_id: string,
+    Username: string
+  ) => {
     e.preventDefault();
 
     try {
@@ -122,6 +131,8 @@ const ProfilePage = () => {
       formData.append("Member2", Username);
       formData.append("Title", `${loggedInUsername}, ${Username}`);
       formData.append("State", "Active");
+      formData.append("member1_user_id", loggedInUserId);
+      formData.append("member2_user_id", user_id);
 
       const response = await fetch("http://localhost:3001/api/private_rooms", {
         method: "PUT",
@@ -131,8 +142,8 @@ const ProfilePage = () => {
       if (response.ok) {
         const private_room_id = await response.json();
         console.log(private_room_id);
- 
-        navigate("/MessagesPage")
+
+        navigate("/MessagesPage");
       } else {
         console.error(
           "Failed to add private room to the database or fetch private room from the database."
@@ -156,6 +167,7 @@ const ProfilePage = () => {
           // Destructure userDetails outside JSX
           (() => {
             const {
+              user_id,
               first_name,
               middle_name,
               last_name,
@@ -245,7 +257,10 @@ const ProfilePage = () => {
                     </h6>
                   )}
                   {Username != loggedInUsername && (
-                    <Button color="primary" onClick={(e) => handleMessage(e, Username)}>
+                    <Button
+                      color="primary"
+                      onClick={(e) => handleMessage(e, user_id, Username)}
+                    >
                       Message
                     </Button>
                   )}
