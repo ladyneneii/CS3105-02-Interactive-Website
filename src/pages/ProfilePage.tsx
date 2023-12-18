@@ -237,14 +237,16 @@ const ProfilePage = () => {
                       {DistanceAway.kilometersAway} km away from you.
                     </h6>
                   )}
-                  {Username != loggedInUsername && (
-                    <Button
-                      color="primary"
-                      onClick={(e) => handleMessage(e, user_id, Username)}
-                    >
-                      Message
-                    </Button>
-                  )}
+                  <div className="mt-3">
+                    {Username != loggedInUsername && (
+                      <Button
+                        color="primary"
+                        onClick={(e) => handleMessage(e, user_id, Username)}
+                      >
+                        Message
+                      </Button>
+                    )}
+                  </div>
                 </div>
                 <div className="col">
                   {Role === "mhp" && (
