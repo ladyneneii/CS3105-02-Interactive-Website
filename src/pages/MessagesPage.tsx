@@ -4,6 +4,8 @@ import Navbar from "../components/Navbar";
 import Chat from "../components/Chat";
 import "../styles/pages/style.css";
 import Button from "../components/Button";
+import { PrivateRoomComponentProps } from "../components/messages/PrivateRoomsList";
+import PrivateRoomsList from "../components/messages/PrivateRoomsList";
 
 const socket = io("http://localhost:3001");
 
@@ -16,7 +18,9 @@ interface RoomProps {
 }
 
 const MessagesPage = () => {
-  // const [username, setUsername] = useState("");
+  const [privateRooms, setPrivateRooms] = useState<PrivateRoomComponentProps[]>(
+    []
+  );
   const roomRef = useRef<HTMLInputElement | null>(null);
   const [room, setRoom] = useState("");
   const [pwd, setPwd] = useState("");
@@ -26,16 +30,49 @@ const MessagesPage = () => {
   const [roomObject, setRoomObject] = useState<RoomProps | undefined>();
   const unparsed_user_details = localStorage.getItem("user_details");
 
+  let logged_in_user_id = "";
+
+  useEffect(() => {
+    const user_details_str = localStorage.getItem("user_details");
+    if (user_details_str) {
+      logged_in_user_id = JSON.parse(user_details_str).user_id;
+    } else {
+      console.error("user details not found in the local storage.");
+    }
+
+    const fetchPrivateRooms = async (logged_in_user_id: string) => {
+      console.log("This is logged in user Id: " + logged_in_user_id);
+      try {
+        const response = await fetch(
+          `http://localhost:3001/api/private_rooms/${logged_in_user_id}`
+        );
+
+        if (response.ok) {
+          const private_rooms_object = await response.json();
+
+          console.log(private_rooms_object);
+          setPrivateRooms(private_rooms_object);
+        } else {
+          console.error("Error retrieving private rooms.");
+        }
+      } catch (error) {
+        console.error("Error during GET request:", error);
+      }
+    };
+
+    fetchPrivateRooms(logged_in_user_id);
+  }, []);
+
   const handleRoomChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newRoom = e.target.value;
     setValidRoom(newRoom.length === 0 ? false : true);
-    setRoom(newRoom)
+    setRoom(newRoom);
   };
 
   const handlePwdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPwd = e.target.value;
     setValidPwd(newPwd.length === 0 ? false : true);
-    setPwd(newPwd)
+    setPwd(newPwd);
   };
 
   useEffect(() => {
@@ -109,7 +146,7 @@ const MessagesPage = () => {
   return (
     <>
       <Navbar></Navbar>
-      <div className="container-xxl">
+      <div className="container-xxl mt-4">
         <div className="row">
           <div className="col">
             <div className="row">
@@ -145,6 +182,11 @@ const MessagesPage = () => {
                   Join
                 </Button>
               </div>
+            </div>
+
+            <div className="border border-danger">
+              <h3>Your Private Chats</h3>
+              <PrivateRoomsList privateRooms={privateRooms} setShowChat={setShowChat} />
             </div>
           </div>
 

@@ -57,15 +57,21 @@ const Chat = ({ socket, username, room, room_id }: ChatProps) => {
 
       if (unparsed_user_details) {
         const user_details = JSON.parse(unparsed_user_details);
+        const currentTime = new Date();
+        let hours = currentTime.getHours();
+        const amPM = hours >= 12 ? "PM" : "AM";
+        hours = hours % 12 || 12;
+        const month = currentTime.getMonth() + 1; 
+        const day = currentTime.getDate();
+        const year = currentTime.getFullYear();
         const messageData: MessageProps = {
           room_id,
           user_id: user_details.user_id,
           Username: username,
           Content: currentMessage,
-          date_time:
-            new Date(Date.now()).getHours() +
-            ":" +
-            new Date(Date.now()).getMinutes(),
+          date_time: `${month}/${day}/${year} ${hours}:${new Date(
+            Date.now()
+          ).getMinutes()} ${amPM}`,
           message_reply_id: null,
           message_reply_username: null,
         };
