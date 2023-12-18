@@ -1,12 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { useEffect, useState } from "react";
 import ScrollToBottom from "react-scroll-to-bottom";
-import empty_pfp from "../assets/img/empty-profile-picture-612x612.jpg";
-import "../styles/components/post.css";
+import empty_pfp from "../../assets/img/empty-profile-picture-612x612.jpg";
+import "../../styles/components/post.css";
 
 interface ChatProps {
   socket: any;
-  username: string | null;
+  username: string;
   room: string;
   room_id: number | undefined;
 }
@@ -25,7 +24,6 @@ interface MessageProps {
 const Chat = ({ socket, username, room, room_id }: ChatProps) => {
   const [currentMessage, setCurrentMessage] = useState("");
   const [messageList, setMessageList] = useState<MessageProps[]>([]);
-  let avatarUrl: string = "";
 
   // retrieve all messages in room_id from the database
   useEffect(() => {

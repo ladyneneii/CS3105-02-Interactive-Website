@@ -8,3 +8,16 @@
   height: 50px;
   object-fit: cover;
 }
+
+.messages__div {
+  background-color: #e9ecef;
+}
+
+.private_chats_list_container {
+  height: 50%;
+}
+
+.private_chat:hover {
+  background-color: #a8d4ff !important;
+  cursor: pointer;
+}
