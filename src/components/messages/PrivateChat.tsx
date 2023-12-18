@@ -83,7 +83,7 @@ const PrivateChat = ({
           private_message_reply_username: null,
         };
 
-        // console.log("This is privateMessageList ", privateMessageList);
+        console.log("This is private_room_id ", parseInt(private_room_id, 10));
 
         await socket.emit("send_private_message", privateMessageData);
         // also add your own message to your end

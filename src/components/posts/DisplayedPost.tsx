@@ -26,6 +26,7 @@ interface DisplayedPostComponentProps {
   isEdited: number;
   setAllPosts: React.Dispatch<React.SetStateAction<PostProps[]>>;
   currentPostReplies: PostProps[];
+  firebaseAvatarUrl: string;
 }
 
 const DisplayedPost = ({
@@ -44,8 +45,8 @@ const DisplayedPost = ({
   isEdited,
   setAllPosts,
   currentPostReplies,
+  firebaseAvatarUrl,
 }: DisplayedPostComponentProps) => {
-  const [avatarUrl, setAvatarUrl] = useState("");
   const user_details_str = localStorage.getItem("user_details");
   let logged_in_user_id = "-1";
   let logged_in_username = "";
@@ -98,33 +99,6 @@ const DisplayedPost = ({
   const [validDisplayedRemark, setValidDisplayedRemark] = useState(false);
   const [showDisplayedRemark, setShowDisplayedRemark] = useState(false);
   const displayedRemarkRef = useRef<HTMLInputElement | null>(null);
-
-  // Retrieve the profile picture
-  useEffect(() => {
-    const storage = getStorage();
-    const avatarRef = ref(storage, Username);
-
-    getDownloadURL(avatarRef)
-      .then((url) => {
-        setAvatarUrl(url);
-      })
-      .catch((error) => {
-        switch (error.code) {
-          case "storage/object-not-found":
-            // File doesn't exist
-            break;
-          case "storage/unauthorized":
-            // User doesn't have permission to access the object
-            break;
-          case "storage/canceled":
-            // User canceled the upload
-            break;
-          case "storage/unknown":
-            // Unknown error occurred, inspect the server response
-            break;
-        }
-      });
-  });
 
   const readTriggeringPost = () => {
     setShowPostContent(true);
@@ -398,8 +372,10 @@ const DisplayedPost = ({
           <>
             <div className="user_details my-2">
               <img
-                src={avatarUrl || empty_pfp}
-                alt="empty profile picture"
+                src={
+                  firebaseAvatarUrl === "n/a" ? empty_pfp : firebaseAvatarUrl
+                }
+                alt="profile picture"
                 className="rounded-circle empty_profile_picture_icon me-3"
               />
               <div className="username_date-time">
@@ -586,6 +562,7 @@ const DisplayedPost = ({
                 Remark,
                 post_edit_id,
                 isEdited,
+                firebase_avatar_url,
               },
               index
             ) =>
@@ -612,6 +589,7 @@ const DisplayedPost = ({
                   isEdited={isEdited}
                   setAllPosts={setAllPosts}
                   currentPostReplies={replies}
+                  firebaseAvatarUrl={firebase_avatar_url || "n/a"}
                 ></DisplayedPost>
               )
           )}

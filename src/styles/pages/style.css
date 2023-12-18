@@ -1,5 +1,9 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,700");
 
+.messages__col {
+  height: 85vh;
+}
+
 .chat-window {
   width: 100%;
   /* height: 90vh; */
@@ -59,6 +63,7 @@
   overflow-wrap: break-word;
   word-break: break-word;
   align-self: flex-end;
+  white-space: pre-wrap;
 }
 
 #you {

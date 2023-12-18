@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import io from "socket.io-client";
 import empty_pfp from "../assets/img/empty-profile-picture-612x612.jpg";
 import Navbar from "../components/Navbar";
@@ -11,7 +10,7 @@ const socket = io("http://localhost:3001");
 interface MHPFullInfoProps {
   user_id: string;
   Username: string;
-  avatar_url: string;
+  firebase_avatar_url: string;
   first_name: string;
   middle_name: string;
   last_name: string;
@@ -57,31 +56,8 @@ const ProfilePage = () => {
     }
     username = !user ? logged_in_username : user;
 
-    const storage = getStorage();
-    const avatarRef = ref(storage, username);
-
-    getDownloadURL(avatarRef)
-      .then((url) => {
-        setAvatarUrl(url);
-        setLoggedInUserId(logged_in_user_id);
-        setLoggedInUsername(logged_in_username);
-      })
-      .catch((error) => {
-        switch (error.code) {
-          case "storage/object-not-found":
-            // File doesn't exist
-            break;
-          case "storage/unauthorized":
-            // User doesn't have permission to access the object
-            break;
-          case "storage/canceled":
-            // User canceled the upload
-            break;
-          case "storage/unknown":
-            // Unknown error occurred, inspect the server response
-            break;
-        }
-      });
+    setLoggedInUserId(logged_in_user_id);
+    setLoggedInUsername(logged_in_username);
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -185,6 +161,7 @@ const ProfilePage = () => {
               Fees,
               Address,
               Notes,
+              firebase_avatar_url,
             } = userDetails;
 
             let disorders_specializations_arr: string[] = [];
@@ -226,7 +203,11 @@ const ProfilePage = () => {
               <div className="row">
                 <div className="col">
                   <img
-                    src={avatarUrl || empty_pfp}
+                    src={
+                      firebase_avatar_url === "n/a"
+                        ? empty_pfp
+                        : firebase_avatar_url
+                    }
                     alt="User avatar"
                     className="border rounded-circle"
                     style={{

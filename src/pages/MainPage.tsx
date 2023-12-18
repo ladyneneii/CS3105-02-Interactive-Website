@@ -6,7 +6,7 @@ import Card from "../components/Card";
 
 interface MHPCardDisplayInfoProps {
   Username: string;
-  avatar_url: string;
+  firebase_avatar_url: string;
   first_name: string;
   middle_name: string;
   last_name: string;
@@ -153,7 +153,7 @@ const MainPage = () => {
           {allMhps.map(
             ({
               Username,
-              avatar_url,
+              firebase_avatar_url,
               first_name,
               middle_name,
               last_name,
@@ -163,7 +163,7 @@ const MainPage = () => {
               <div key={Username} className="col">
                 <Card
                   Username={Username}
-                  avatar_url={avatar_url}
+                  firebase_avatar_url={firebase_avatar_url}
                   first_name={first_name}
                   middle_name={middle_name}
                   last_name={last_name}

@@ -93,7 +93,9 @@ const MessagesPage = () => {
   }, [roomObject]);
 
   useEffect(() => {
-    setShowPrivateChat(true);
+    if (privateRoomId) {
+      setShowPrivateChat(true);
+    }
   }, [privateRoomId, dummyKey]);
 
   console.log(privateRoomId);
@@ -154,7 +156,7 @@ const MessagesPage = () => {
       <Navbar></Navbar>
       <div className="container-xxl mt-4">
         <div className="row">
-          <div className="col">
+          <div className="col messages__col">
             <div className="messages__div border rounded-5 p-4 mb-4">
               <div className="row">
                 <h3 className="mb-3">Join a chatroom</h3>
@@ -205,7 +207,7 @@ const MessagesPage = () => {
             </div>
           </div>
 
-          <div className="col">
+          <div className="col messages__col">
             {showChat && (
               <Chat
                 socket={socket}

@@ -18,6 +18,7 @@ export interface PostProps {
   Remark: string;
   post_edit_id: string;
   isEdited: number;
+  firebase_avatar_url: string;
 }
 
 export const getAllPosts = async () => {
@@ -27,7 +28,6 @@ export const getAllPosts = async () => {
 
     if (response.ok) {
       const posts_json = await response.json();
-      console.log(posts_json);
 
       return posts_json;
     } else {
@@ -54,6 +54,7 @@ export const storeReplies = (
   ) {
     replies.push(allPosts[i]);
   }
+  // console.log(allPosts);
 
   // console.log(`Replies to post_id ${allPosts[index]["post_id"]}: ${replies}`);
 
@@ -192,6 +193,7 @@ const PostsPage = () => {
               Remark,
               post_edit_id,
               isEdited,
+              firebase_avatar_url,
             },
             index
           ) =>
@@ -214,6 +216,7 @@ const PostsPage = () => {
                 isEdited={isEdited}
                 setAllPosts={setAllPosts}
                 currentPostReplies={replies}
+                firebaseAvatarUrl={firebase_avatar_url}
               ></DisplayedPost>
             )
         )}
